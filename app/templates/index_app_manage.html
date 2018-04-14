@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block subtitle1 %}
+    Web App Manage
+{% endblock %}
+
+{% block subtitle2 %}
+    Web App Manage
+{% endblock %}
+
+{% block subnavbar %}
+    <li class="active">
+        <a href="index_app_manage.html">
+            <span class="icon fa fa-tachometer"></span><span class="title">Dashboard</span>
+        </a>
+    </li>
+    <li class="panel panel-default dropdown">
+        <a data-toggle="collapse" href="#dropdown-element">
+            <span class="icon fa fa-desktop"></span><span class="title">UI Kits</span>
+        </a>
+        <!-- Dropdown level 1 -->
+        <div id="dropdown-element" class="panel-collapse collapse">
+            <div class="panel-body">
+                <ul class="nav navbar-nav">
+                    <li><a href="ui-kits/theming.html">Theming</a>
+                    </li>
+                    <li><a href="ui-kits/grid.html">Grid</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </li>
+    <li>
+        <a href="license.html">
+            <span class="icon fa fa-thumbs-o-up"></span><span class="title">License</span>
+        </a>
+    </li>
+{% endblock %}
+
+{% block app_content %}
+    <p>App Manage</p>
+    <h1>{{ _('Hi, %(username)s!', username=current_user.username) }}</h1>
+    {% if form %}
+    {{ wtf.quick_form(form) }}
+    <br>
+    {% endif %}
+    {% for post in posts %}
+        {% include '_post.html' %}
+    {% endfor %}
+    <nav aria-label="...">
+        <ul class="pager">
+            <li class="previous{% if not prev_url %} disabled{% endif %}">
+                <a href="{{ prev_url or '#' }}">
+                    <span aria-hidden="true">&larr;</span> {{ _('Newer posts') }}
+                </a>
+            </li>
+            <li class="next{% if not next_url %} disabled{% endif %}">
+                <a href="{{ next_url or '#' }}">
+                    {{ _('Older posts') }} <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+{% endblock %}

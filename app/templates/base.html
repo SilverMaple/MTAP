@@ -1,0 +1,154 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}
+    {% if title %}{{ title }} - MTAP{% else %}{{ _('Welcome to MTAP') }}{% endif %}
+{% endblock %}
+
+{% block styles %}
+    <!-- Fonts -->
+{#    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:300,400' rel='stylesheet' type='text/css'>#}
+{#    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>#}
+    <!-- CSS Libs -->
+    <link rel="stylesheet" type="text/css" href="../static/lib/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/lib/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/lib/css/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/lib/css/bootstrap-switch.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/lib/css/checkbox3.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/lib/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/lib/css/dataTables.bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../static/lib/css/select2.min.css">
+    <!-- CSS App -->
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/themes/flat-blue.css">
+{% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-default navbar-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">MTAP</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="{{ url_for('main.index') }}">{{ _('Home') }}</a></li>
+                    <li><a href="{{ url_for('main.index_registe') }}">{{ _('Registe Manage') }}</a></li>
+                    <li><a href="{{ url_for('main.index_app') }}">{{ _('Web App Manage') }}</a></li>
+                    <li><a href="{{ url_for('main.index_tenant') }}">{{ _('Tenant Service') }}</a></li>
+                    <li><a href="{{ url_for('main.explore') }}">{{ _('Explore') }}</a></li>
+                </ul>
+                {% if g.search_form %}
+                <form class="navbar-form navbar-left" method="get"
+                        action="{{ url_for('main.search') }}">
+                    <div class="form-group">
+                        {{ g.search_form.q(size=20, class='form-control',
+                            placeholder=g.search_form.q.label.text) }}
+                    </div>
+                </form>
+                {% endif %}
+                <ul class="nav navbar-nav navbar-right">
+                    {% if current_user.is_anonymous %}
+                    <li><a href="{{ url_for('auth.login') }}">{{ _('Login') }}</a></li>
+                    {% else %}
+                    <li><a href="{{ url_for('main.user', username=current_user.username) }}">{{ _('Profile') }}</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="col"s>
+        <div class="app-container flat-blue">
+            <div class="col content-container">
+                <div class="side-menu sidebar-inverse">
+                    <nav class="navbar navbar-default" role="navigation">
+                        <div class="side-menu-container">
+                            <div class="navbar-header">
+                                <a class="navbar-brand" href="#">
+                                    <div class="icon fa fa-desktop"></div>
+                                    <div class="title">{% block subtitle1 %}{% endblock %}</div>
+                                </a>
+                                <button type="button" class="navbar-expand-toggle pull-right visible-xs">
+                                    <i class="fa fa-times icon"></i>
+                                </button>
+                            </div>
+                            <ul class="nav navbar-nav">
+                                {% block subnavbar %}{% endblock %}
+                            </ul>
+                        </div>
+                        <!-- /.navbar-collapse -->
+                    </nav>
+                </div>
+                <nav class="navbar navbar-default navbar-top">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-expand-toggle">
+                                <i class="fa fa-bars icon"></i>
+                            </button>
+                            <ol class="breadcrumb navbar-breadcrumb">
+                                <li class="active">{% block subtitle2 %}{% endblock %}</li>
+                            </ol>
+                        </div>
+                    </div>
+                </nav>
+                <!-- Main Content -->
+                <div class="container-fluid side-body" style="padding-top: 5px;">
+                    {% if confirmMessage %}
+                        <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                            <button id="closeConfirmMessage" type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                            <h4 style="text-align: center;" id="confirmDialog">{{ confirmTitle }}</h4>
+                            <p style="text-align: center;">{{ confirmMessage }}</p>
+                            <p align="center" >
+                                <button type="button" class="btn btn-danger" onclick="confirm()">{{ _('Confirm') }}</button>
+                                <button type="button" class="btn btn-link" data-dismiss="alert" >
+                                    {{ _('Cancel') }}
+                                </button>
+                            </p>
+                        </div>
+                    {% endif %}
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-info" role="alert">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    {# application content needs to be provided in the app_content block #}
+                    {% block app_content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
+    {{ moment.lang(g.locale) }}
+    <!-- Javascript Libs -->
+    <script type="text/javascript" src="../static/lib/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/Chart.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/bootstrap-switch.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/jquery.matchHeight-min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/select2.full.min.js"></script>
+    <script type="text/javascript" src="../static/lib/js/ace/ace.js"></script>
+    <script type="text/javascript" src="../static/lib/js/ace/mode-html.js"></script>
+    <script type="text/javascript" src="../static/lib/js/ace/theme-github.js"></script>
+    <!-- Javascript -->
+    <script type="text/javascript" src="../static/js/app.js"></script>
+    <script type="text/javascript" src="../static/js/index.js"></script>
+{% endblock %}

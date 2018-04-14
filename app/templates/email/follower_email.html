@@ -1,0 +1,13 @@
+<p>Dear {{ user.username }},</p>
+<p><a href="{{ url_for("main.user", username=follower.username, _external=True) }}">{{ follower.username }}</a> is now a follower.</p>
+<table>
+    <tr valign="top">
+        <td><img src="{{ follower.avatar(50) }}"></td>
+        <td>
+            <a href="{{ url_for("main.user", username=follower.username, _external=True) }}">{{ follower.username }}</a><br />
+            {{ follower.about_me }}
+        </td>
+    </tr>
+</table>
+<p>Regards,</p>
+<p>The <code>MoodBit</code> Team</p>
