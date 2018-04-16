@@ -1,6 +1,42 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
+{% block subtitle1 %}
+    {{ _('Home') }}
+{% endblock %}
+
+{% block subtitle2 %}
+    {{ _('Home') }}
+{% endblock %}
+
+{% block subnavbar %}
+    <li id="dashboard">
+        <a href={{ url_for('main.index') }}>
+            <span class="icon fa fa-tachometer"></span><span class="title">{{  _('Dashboard') }}</span>
+        </a>
+    </li>
+    <li id="index_registe">
+        <a href={{ url_for('main.index_registe') }}>
+            <span class="icon fa fa-registered fa-fw"></span><span class="title">{{ _('Registe Manage') }}</span>
+        </a>
+    </li>
+    <li id="index_app">
+        <a href={{ url_for('main.index_app') }}>
+            <span class="icon fa fa-th-large fa-fw"></span><span class="title">{{ _('Web App Manage') }}</span>
+        </a>
+    </li>
+    <li id="index_tenant">
+        <a href={{ url_for('main.index_tenant') }}>
+            <span class="icon fa fa-user fa-fw"></span><span class="title">{{ _('Tenant Service') }}</span>
+        </a>
+    </li>
+    <li id="explore">
+        <a href={{ url_for('main.explore') }}>
+            <span class="icon fa fa-eye fa-fw"></span><span class="title">{{ _('Explore') }}</span>
+        </a>
+    </li>
+{% endblock %}
+
 {% block app_content %}
     <h1>{{ _('Hi, %(username)s!', username=current_user.username) }}</h1>
     {% if form %}

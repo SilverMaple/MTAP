@@ -104,8 +104,8 @@
                                         <th>{{ d.type }}</th>
                                         <th>{{ d.pattern_begin }}</th>
                                         <th>{{ d.pattern_end }}</th>
-                                        <th>{{ d.library_path }}</th>
-                                        <th>{{ d.db_init_path }}</th>
+                                        <th style="Word-break: break-all">{{ d.library_path }}</th>
+                                        <th style="Word-break: break-all">{{ d.db_init_path }}</th>
                                         <th>
                                             {% if isEdit %}
                                             <a href={{ url_for('main.registe_manage_app_extension_edit', id=d.id) }}>

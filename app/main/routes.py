@@ -15,7 +15,8 @@ from flask_babel import _, get_locale
 from flask_uploads import UploadSet
 from guess_language import guess_language
 from app import db
-from app.main.forms import EditProfileForm, PostForm, SearchForm, AddAppForm, AddAppExtensionForm, EditAppExtensionForm
+from app.main.forms import EditProfileForm, PostForm, SearchForm, AddAppForm, AddAppExtensionForm, EditAppExtensionForm, \
+    AddAppAdminForm, AddTenantForm
 from app.models import User, Post, App, AppAdmin, AppExpand, AdminToApp, Tenant
 from app.translate import translate
 from app.main import bp
@@ -24,6 +25,7 @@ from app.auth import LoginType, current_login_type
 from app import auth
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash
 
 
 @bp.before_app_request
@@ -204,7 +206,7 @@ def registe_manage_app_setting():
     isDelete = True
     session['is_delete'] = 'false'
     tHead = [_('App Name'), _('App ID'), _('Creator')]
-    data = App.query.all()
+    data = App.query.order_by(db.asc(App.name)).all()
     return render_template('registe_manage_app_setting.html', title=_('App Setting'),
                            tableName=_('App List'), AppAdmin=AppAdmin,
                            isCheck=isCheck, isEdit=isEdit,
@@ -299,7 +301,7 @@ def registe_manage_app_extension():
     isEdit = True
     isDelete = True
     tHead = [_('App Type'), _('Tag Template/Begin'), _('Tag Template/End'), _('Library File'), _('DB Initial Path')]
-    data = AppExpand.query.all()
+    data = AppExpand.query.order_by(db.asc(AppExpand.type)).all()
     return render_template('registe_manage_app_extension.html', title=_('App Extension'),
                            tableName=_('App Extension List'),
                            isCheck=isCheck, isEdit=isEdit,
@@ -427,21 +429,158 @@ def registe_manage_app_manager_setting():
     isDelete = True
     tHead = [_('App Manager Name'), _('App Name')]
     data = {}
-    preData = AdminToApp.query.all()
+
+    preData = AppAdmin.query.all()
     for p in preData:
-        print(p.app_admin_id)
-        managerName = AppAdmin.query.filter(AppAdmin.id == p.app_admin_id).first().name
-        appName = App.query.filter(App.id == p.app_id).first().name
-        if data.get(managerName):
-            data[managerName] += (';' + appName)
+        managerName = p.name
+        for temp in AdminToApp.query.filter(AdminToApp.app_admin_id == p.id):
+            appName = App.query.filter(App.id == temp.app_id).first().name
+            if data.get(managerName):
+                data[managerName]['name'].append(appName)
+            else:
+                data[managerName] = {}
+                data[managerName]['id'] = p.id
+                data[managerName]['name'] = []
+                data[managerName]['name'].append(appName)
+        if not data.get(managerName):
+            data[managerName] = {}
+            data[managerName]['id'] = p.id
+            data[managerName]['name'] = ''
         else:
-            data[managerName] = appName
+            data[managerName]['name'].sort()
+            data[managerName]['name'] = '; '.join(data[managerName]['name'])
+    data['sort'] = list(data.keys())
+    data['sort'].sort()
     return render_template('registe_manage_app_manager_setting.html', title=_('App Manager Setting'),
                            tableName=_('App Manager List'),
                            isCheck=isCheck, isEdit=isEdit,
                            isDelete=isDelete, tHead=tHead, data=data)
 
 
+@bp.route('/registe_manage_app_manager_setting_add', methods=['GET', 'POST'])
+@login_required
+def registe_manage_app_manager_setting_add():
+    form = AddAppAdminForm(None)
+    if form.validate_on_submit():
+        db.session.add(AppAdmin(id=None, name=form.app_admin_name.data,
+                                password=generate_password_hash(form.app_admin_password.data)))
+        db.session.commit()
+        app_admin_id = AppAdmin.query.filter(AppAdmin.name == form.app_admin_name.data).first().id
+        for app_name in form.app_list.data:
+            app_id = App.query.filter(App.name == app_name).first().id
+            db.session.add(AdminToApp(id=None, app_admin_id=app_admin_id, app_id=app_id))
+        db.session.commit()
+        flash(_('New app manager have been added.'))
+        return redirect(url_for('main.registe_manage_app_manager_setting'))
+    elif request.method == 'GET':
+        pass
+    return render_template('registe_manage_app_manager_setting.html', title=_('App Manager Setting'),
+                           tableName=_('Add New App Manager'), AppAdmin=AppAdmin, form=form,
+                           addTitle=('Add New App Manager'))
+
+
+@bp.route('/registe_manage_app_manager_setting_delete/<id>', methods=['GET', 'POST'])
+@login_required
+def registe_manage_app_manager_setting_delete(id):
+    if request.method == 'GET':
+        session['current_delete_id'] = id
+    else:
+        data = request.get_json()
+        name = data.get('name')
+        if name == 'execute':
+            current_data = AppAdmin.query.filter(AppAdmin.id == session['current_delete_id']).first()
+            for removeAdminToApp in AdminToApp.query.filter(AdminToApp.app_admin_id==current_data.id).all():
+                db.session.delete(removeAdminToApp)
+            db.session.delete(current_data)
+            db.session.commit()
+            flash(_('Record have been deleted.'))
+            return jsonify({'result': 'success'})
+
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    tHead = [_('App Manager Name'), _('App Name')]
+    data = {}
+
+    preData = AppAdmin.query.all()
+    for p in preData:
+        managerName = p.name
+        for temp in AdminToApp.query.filter(AdminToApp.app_admin_id == p.id):
+            appName = App.query.filter(App.id == temp.app_id).first().name
+            if data.get(managerName):
+                data[managerName]['name'].append(appName)
+            else:
+                data[managerName] = {}
+                data[managerName]['id'] = p.id
+                data[managerName]['name'] = []
+                data[managerName]['name'].append(appName)
+        if not data.get(managerName):
+            data[managerName] = {}
+            data[managerName]['id'] = p.id
+            data[managerName]['name'] = ''
+        else:
+            data[managerName]['name'].sort()
+            data[managerName]['name'] = '; '.join(data[managerName]['name'])
+    data['sort'] = list(data.keys())
+    data['sort'].sort()
+    confirmTitle = 'Confirm your choice:'
+    confirmMessage = 'Do you want to delete this record?'
+    return render_template('registe_manage_app_manager_setting.html', title=_('App Manager Setting'),
+                           tableName=_('App Manager List'),
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data,
+                           confirmTitle=confirmTitle, confirmMessage=confirmMessage)
+
+
+@bp.route('/registe_manage_app_manager_setting_delete_select', methods=['GET', 'POST'])
+@login_required
+def registe_manage_app_manager_setting_delete_select():
+        flash(_('Batch delete operation are not allowed now.'))
+        return redirect(url_for('main.registe_manage_app_manager_setting'))
+
+
+@bp.route('/registe_manage_app_manager_setting_edit/<id>', methods=['GET', 'POST'])
+@login_required
+def registe_manage_app_manager_setting_edit(id):
+    if session.get('validate_app_admin_name'):
+        form = AddAppAdminForm(session['validate_app_admin_name'])
+    else:
+        form = AddAppAdminForm(None)
+    if form.validate_on_submit():
+        old_app_list = session['old_app_list'] if session.get('old_app_list') else []
+        new_app_list = form.app_list.data
+        add_app_list = [a for a in new_app_list if a not in old_app_list]
+        remove_app_list = [a for a in old_app_list if a not in new_app_list]
+        current_data = AppAdmin.query.filter(AppAdmin.id == id).first()
+        current_data.name = form.app_admin_name.data
+        if not form.app_admin_password.data.strip() == '':
+            current_data.password = generate_password_hash(form.app_admin_password.data)
+        for a in add_app_list:
+            add_app_id = App.query.filter(App.name == a).first().id
+            db.session.add(AdminToApp(id=None, app_admin_id=id, app_id=add_app_id))
+        for a in remove_app_list:
+            remove_app_id = App.query.filter(App.name == a).first().id
+            removeAdminToApp = AdminToApp.query.filter(AdminToApp.app_admin_id==id, AdminToApp.app_id==remove_app_id).first()
+            db.session.delete(removeAdminToApp)
+        db.session.commit()
+        flash(_('App Admin have been edited.'))
+        return redirect(url_for('main.registe_manage_app_manager_setting'))
+    elif request.method == 'GET':
+        current_data = AppAdmin.query.filter(AppAdmin.id == id).first()
+        app_list = [a.app_id for a in AdminToApp.query.filter(AdminToApp.app_admin_id == id)]
+        app_name_list = [App.query.filter(App.id == a).first().name for a in app_list]
+        form.app_admin_name.data = current_data.name
+        form.app_list.data = app_name_list
+        session['validate_app_admin_name'] = form.app_admin_name.data
+        session['old_app_list'] = app_name_list
+    return render_template('registe_manage_app_manager_setting.html', title=_('App Manager Setting'),
+                           tableName=_('Edit App Manager'), AppAdmin=AppAdmin, form=form,
+                           editTitle=('Edit App Manager'))
+
+
+# ---------------------------------------------------------------------------------------
+# registe manage app tenant setting
+# ---------------------------------------------------------------------------------------
 @bp.route('/registe_manage_app_tenant_setting')
 @login_required
 def registe_manage_app_tenant_setting():
@@ -449,8 +588,92 @@ def registe_manage_app_tenant_setting():
     isEdit = True
     isDelete = True
     tHead = [_('App Tenant Name'), _('App Tenant ID'), _('App Name')]
-    data = Tenant.query.all()
+    data = Tenant.query.order_by(db.asc(Tenant.name)).all()
     return render_template('registe_manage_app_tenant_setting.html', title=_('App Tenant Setting'),
                            tableName=_('App Tenant List'), App=App,
                            isCheck=isCheck, isEdit=isEdit,
                            isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/registe_manage_app_tenant_setting_add', methods=['GET', 'POST'])
+@login_required
+def registe_manage_app_tenant_setting_add():
+    form = AddTenantForm(None)
+    if form.validate_on_submit():
+        app_id = App.query.filter(App.name == form.app_list.data).first().id
+        db.session.add(Tenant(id=None, name=form.tenant_name.data,
+                                password=generate_password_hash(form.tenant_password.data),
+                                tenantid=hashlib.md5(form.tenant_name.data.encode(encoding='UTF-8')).hexdigest(),
+                                app_id=app_id))
+        db.session.commit()
+        flash(_('New Tenant have been added.'))
+        return redirect(url_for('main.registe_manage_app_tenant_setting'))
+    elif request.method == 'GET':
+        pass
+    return render_template('registe_manage_app_tenant_setting.html', title=_('App Tenant Setting'),
+                           tableName=_('Add New App Tenant'), form=form,
+                           addTitle=('Add New App Tenant'))
+
+
+@bp.route('/registe_manage_app_tenant_setting_delete/<id>', methods=['GET', 'POST'])
+@login_required
+def registe_manage_app_tenant_setting_delete(id):
+    if request.method == 'GET':
+        session['current_delete_id'] = id
+    else:
+        data = request.get_json()
+        name = data.get('name')
+        if name == 'execute':
+            current_data = Tenant.query.filter(Tenant.id == session['current_delete_id']).first()
+            db.session.delete(current_data)
+            db.session.commit()
+            flash(_('Record have been deleted.'))
+            return jsonify({'result': 'success'})
+
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    tHead = [_('App Tenant Name'), _('App Tenant ID'), _('App Name')]
+    data = Tenant.query.order_by(db.asc(Tenant.name)).all()
+    confirmTitle = 'Confirm your choice:'
+    confirmMessage = 'Do you want to delete this record?'
+    return render_template('registe_manage_app_tenant_setting.html', title=_('App Tenant Setting'),
+                           tableName=_('App Tenant List'), App=App,
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data,
+                           confirmTitle=confirmTitle, confirmMessage=confirmMessage)
+
+@bp.route('/registe_manage_app_tenant_setting_delete_select', methods=['GET', 'POST'])
+@login_required
+def registe_manage_app_tenant_setting_delete_select():
+        flash(_('Batch delete operation are not allowed now.'))
+        return redirect(url_for('main.registe_manage_app_manager_setting'))
+
+
+@bp.route('/registe_manage_app_tenant_setting_edit/<id>', methods=['GET', 'POST'])
+@login_required
+def registe_manage_app_tenant_setting_edit(id):
+    if session.get('validate_app_tenant_name'):
+        form = AddTenantForm(session['validate_app_tenant_name'])
+    else:
+        form = AddTenantForm(None)
+    if form.validate_on_submit():
+        current_data = Tenant.query.filter(Tenant.id == id).first()
+        current_data.name = form.tenant_name.data
+        if not form.tenant_password.data.strip() == '':
+            current_data.password = generate_password_hash(form.tenant_password.data)
+        app_id = App.query.filter(App.name == form.app_list.data).first().id
+        current_data.app_id = app_id
+        db.session.commit()
+        flash(_('App Tenant have been edited.'))
+        return redirect(url_for('main.registe_manage_app_tenant_setting'))
+    elif request.method == 'GET':
+        current_data = Tenant.query.filter(Tenant.id == id).first()
+        app_name =  App.query.filter(App.id == current_data.app_id).first().name
+        form.tenant_name.data = current_data.name
+        form.app_list.data = app_name
+        form.tenant_id.data = current_data.tenantid
+        session['validate_app_tenant_name'] = form.tenant_name.data
+    return render_template('registe_manage_app_tenant_setting.html', title=_('App Tenant Setting'),
+                           tableName=_('Edit App Tenant'), form=form,
+                           editTitle=('Edit App Tenant'))
