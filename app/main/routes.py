@@ -16,8 +16,8 @@ from flask_uploads import UploadSet
 from guess_language import guess_language
 from app import db
 from app.main.forms import EditProfileForm, PostForm, SearchForm, AddAppForm, AddAppExtensionForm, EditAppExtensionForm, \
-    AddAppAdminForm, AddTenantForm
-from app.models import User, Post, App, AppAdmin, AppExpand, AdminToApp, Tenant
+    AddAppAdminForm, AddTenantForm, AddTenantDatabaseForm, EditTenantDatabaseForm, AddAppCodeForm
+from app.models import User, Post, App, AppAdmin, AppExpand, AdminToApp, Tenant, TenantDb, AppCode
 from app.translate import translate
 from app.main import bp
 from app.email import follower_notification
@@ -76,7 +76,16 @@ def index_registe():
 @bp.route('/index_app')
 def index_app():
     if current_user.is_authenticated and auth.current_login_type == LoginType.WEB_APP_MANAGE:
-        return render_template('index_app_manage.html', title=_('Web App Manage'))
+        app_list = [a.app_id for a in AdminToApp.query.filter(
+            AdminToApp.app_admin_id == session['current_app_manager_id']).all()]
+        data = [App.query.filter(App.id == a).order_by(db.asc(App.name)).first() for a in app_list]
+        data.sort(key=lambda a: a.name)
+        app_name_list = [a.name for a in data]
+        current_selected_app_name = None
+        if session.get('current_selected_app_name'):
+            current_selected_app_name = session['current_selected_app_name']
+        return render_template('index_app_manage.html', title=_('Web App Manage'), app_name_list=app_name_list,
+                               current_selected_app_name=current_selected_app_name)
     else:
         auth.current_login_type = LoginType.WEB_APP_MANAGE
         return redirect(url_for('auth.login'))
@@ -677,3 +686,693 @@ def registe_manage_app_tenant_setting_edit(id):
     return render_template('registe_manage_app_tenant_setting.html', title=_('App Tenant Setting'),
                            tableName=_('Edit App Tenant'), form=form,
                            editTitle=('Edit App Tenant'))
+
+
+# ---------------------------------------------------------------------------------------
+# app manage change current app
+# ---------------------------------------------------------------------------------------
+@bp.route('/app_manage_set_current_app', methods=['GET', 'POST'])
+@login_required
+def app_manage_set_current_app():
+    if request.method == 'POST':
+        data = request.get_json()
+        name = data.get('name')
+        current_data = App.query.filter(App.name == name).first()
+        if current_data:
+            session['current_selected_app_id'] = current_data.id
+            session['current_selected_app_name'] = current_data.name
+            flash(_('Switch current app success!'))
+            return jsonify({'result': 'success'})
+
+
+def get_app_name_list():
+    app_list = [a.app_id for a in AdminToApp.query.filter(
+        AdminToApp.app_admin_id == session['current_app_manager_id']).all()]
+    data = [App.query.filter(App.id == a).order_by(db.asc(App.name)).first() for a in app_list]
+    data.sort(key=lambda a: a.name)
+    app_name_list = [a.name for a in data]
+    return app_name_list
+
+def get_current_selected_app_name():
+    current_selected_app_name = None
+    if session.get('current_selected_app_name'):
+        current_selected_app_name = session['current_selected_app_name']
+    return current_selected_app_name
+
+
+# ---------------------------------------------------------------------------------------
+# app manage app list
+# ---------------------------------------------------------------------------------------
+@bp.route('/app_manage_app_list')
+@login_required
+def app_manage_app_list():
+    isCheck = True
+    tHead = [_('App Name'), _('App ID'), _('Creator')]
+    app_list = [ a.app_id for a in AdminToApp.query.filter(
+        AdminToApp.app_admin_id == session['current_app_manager_id']).all()]
+    data = [ App.query.filter(App.id == a).order_by(db.asc(App.name)).first() for a in app_list]
+    data.sort(key=lambda a: a.name)
+    return render_template('app_manage_app_list.html', title=_('App List'),
+                           tableName=_('App List'), AppAdmin=AppAdmin, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, tHead=tHead, data=data)
+
+
+# ---------------------------------------------------------------------------------------
+# app manage code configure
+# ---------------------------------------------------------------------------------------
+@bp.route('/app_manage_function_configure')
+@login_required
+def app_manage_function_configure():
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('App Name'), _('App ID'), _('Creator')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    return render_template('app_manage_function_configure.html', title=_('Online Function'),
+                           tableName=_('Function Configure'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+# ---------------------------------------------------------------------------------------
+# app manage database configure
+# ---------------------------------------------------------------------------------------
+@bp.route('/app_manage_database_configure')
+@login_required
+def app_manage_database_configure():
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('Tenant'), _('Is System Extension'), _('Database'), _('IP'), _('Port')]
+    data = TenantDb.query.filter(TenantDb.app_id == session['current_selected_app_id']).order_by(db.asc(TenantDb.database)).all()
+    return render_template('app_manage_database_configure.html', title=_('Tenant Database List'),
+                           tableName=_('Tenant Database List'), Tenant=Tenant, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/app_manage_database_configure_add', methods=['GET', 'POST'])
+@login_required
+def app_manage_database_configure_add():
+    form = AddTenantDatabaseForm(None)
+    if form.validate_on_submit():
+        current_tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
+        current_type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
+        db.session.add(TenantDb(id=None, hostname=form.host_name.data, driver=form.database_driver.data,
+                                username=form.user_name.data,
+                                password=generate_password_hash(form.user_password.data),
+                                database=form.database_name.data, port=form.database_port.data,
+                                aliasname='_'.join([form.database_driver.data, form.database_name.data]),
+                                type=current_type, tenant_id=current_tenant_id, app_id=session['current_selected_app_id']))
+        db.session.commit()
+        flash(_('New tenant database have been added.'))
+        return redirect(url_for('main.app_manage_database_configure'))
+    elif request.method == 'GET':
+        form.app_name.data = session['current_selected_app_name']
+        form.host_name.data = 'localhost'
+        form.database_port.data = '3306'
+        form.database_driver.data = 'mysql'
+        form.user_name.data = 'root'
+        pass
+    return render_template('app_manage_database_configure.html', title=_('Tenant Database Configure'),
+                           tableName=_('Add New Tenant Database'), form=form, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           addTitle=('Add New Tenant Database'))
+
+
+@bp.route('/app_manage_database_configure_delete/<id>', methods=['GET', 'POST'])
+@login_required
+def app_manage_database_configure_delete(id):
+    if request.method == 'GET':
+        session['current_delete_id'] = id
+    else:
+        data = request.get_json()
+        name = data.get('name')
+        if name == 'execute':
+            current_data = TenantDb.query.filter(TenantDb.id == session['current_delete_id']).first()
+            db.session.delete(current_data)
+            db.session.commit()
+            flash(_('Record have been deleted.'))
+            return jsonify({'result': 'success'})
+
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('Tenant'), _('Is System Extension'), _('Database'), _('IP'), _('Port')]
+    data = TenantDb.query.filter(TenantDb.app_id == session['current_selected_app_id']).order_by(
+        db.asc(TenantDb.username)).all()
+    confirmTitle = 'Confirm your choice:'
+    confirmMessage = 'Do you want to delete this record?'
+    return render_template('app_manage_database_configure.html', title=_('Tenant Database List'),
+                           tableName=_('Tenant Database List'), Tenant=Tenant, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data,
+                           confirmTitle=confirmTitle, confirmMessage=confirmMessage)
+
+
+@bp.route('/app_manage_database_configure_delete_select', methods=['GET', 'POST'])
+@login_required
+def app_manage_database_configure_delete_select():
+        flash(_('Batch delete operation are not allowed now.'))
+        return redirect(url_for('main.app_manage_database_configure'))
+
+
+@bp.route('/app_manage_database_configure_edit/<id>', methods=['GET', 'POST'])
+@login_required
+def app_manage_database_configure_edit(id):
+    if session.get('validate_alias_name'):
+        form = EditTenantDatabaseForm(session['validate_alias_name'])
+    else:
+        form = EditTenantDatabaseForm(None)
+    if form.validate_on_submit():
+        current_data = TenantDb.query.filter(TenantDb.id == id).first()
+        current_data.hostname = form.host_name.data
+        current_data.driver = form.database_driver.data
+        current_data.username = form.user_name.data
+        current_data.database = form.database_name.data
+        current_data.port = form.database_port.data
+        current_data.aliasname = '_'.join([form.database_driver.data, form.database_name.data])
+        current_data.type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
+        current_data.tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
+        current_data.app_id = session['current_selected_app_id']
+        if not form.user_password.data.strip() == '':
+            current_data.password = generate_password_hash(form.user_password.data)
+        db.session.commit()
+        flash(_('Tenant Database have been edited.'))
+        return redirect(url_for('main.app_manage_database_configure'))
+    elif request.method == 'GET':
+        current_data = TenantDb.query.filter(TenantDb.id == id).first()
+        form.app_name.data = session['current_selected_app_name']
+        form.host_name.data = current_data.hostname
+        form.database_port.data = current_data.port
+        form.system_extension.data = 'System Extension' if current_data.type == 'system' else 'Not System Extension'
+        form.database_driver.data = current_data.driver
+        form.database_name.data = current_data.database
+        form.user_name.data = current_data.username
+        form.user_password.description = 'In edit mode, set null in this field means no modification for current password.'
+        session['validate_alias_name'] = '_'.join([form.database_driver.data, form.database_name.data])
+    return render_template('app_manage_database_configure.html', title=_('Tenant Database Configure'),
+                           tableName=_('Edit Tenant Database'), form=form,app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           editTitle=('Edit Tenant Database'))
+
+
+# ---------------------------------------------------------------------------------------
+# app manage code configure
+# ---------------------------------------------------------------------------------------
+@bp.route('/app_manage_code_configure', methods=['GET', 'POST'])
+@login_required
+def app_manage_code_configure():
+    if session.get('validate_repo'):
+        form = AddAppCodeForm(session['validate_repo'])
+    else:
+        form = AddAppCodeForm(None)
+    if form.validate_on_submit():
+        current_data = TenantDb.query.filter(TenantDb.id == id).first()
+        current_data.hostname = form.host_name.data
+        current_data.driver = form.database_driver.data
+        current_data.username = form.user_name.data
+        current_data.database = form.database_name.data
+        current_data.port = form.database_port.data
+        current_data.aliasname = '_'.join([form.database_driver.data, form.database_name.data])
+        current_data.type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
+        current_data.tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
+        current_data.app_id = session['current_selected_app_id']
+        if not form.user_password.data.strip() == '':
+            current_data.password = generate_password_hash(form.user_password.data)
+        db.session.commit()
+        flash(_('Tenant Database have been edited.'))
+        return redirect(url_for('main.app_manage_database_configure'))
+    elif request.method == 'GET':
+        current_data = AppCode.query.filter(AppCode.app_id == session['current_selected_app_id']).first()
+        current_extension_data = AppExpand.query.filter(AppExpand.type == 'jsp servlet').first()
+        form.code_repo.data = current_data.repo
+        form.tag_begin.data = current_extension_data.pattern_begin
+        form.tag_end.data = current_extension_data.pattern_end
+        form.db_config_path.data = current_data.db_config_path
+        form.remote_login_config_path.data = current_data.remote_login_configure_path
+        form.remote_login_using_flag.data = current_data.remote_login_using_flag
+        form.remote_login_using_content.data = current_data.remote_login_using_content
+
+        form.library_path.data = current_data.library_path
+        form.filter_package_path.data = current_data.filter_package_path
+        form.filter_content.data = current_data.filter_content
+        form.filter_config_path.data = current_data.filter_configure_path
+
+        form.filter_import_flag.data = current_data.filter_import_flag
+        form.filter_import_content.data = current_data.filter_import_content
+        form.filter_using_flag.data = current_data.filter_using_flag
+        form.filter_using_content.data = current_data.filter_using_content
+
+        form.call_starting_point.data = current_data.call_starting_point
+        form.third_party_packages.data = current_data.third_party_packages
+
+        session['validate_repo'] = form.code_repo.data
+    return render_template('app_manage_code_configure.html', title=_('Edit Code Information'),
+                           tableName=_('Edit Code Information'), form=form, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name())
+
+
+# ---------------------------------------------------------------------------------------
+# app manage mirror list
+# ---------------------------------------------------------------------------------------
+@bp.route('/app_manage_mirror_list')
+@login_required
+def app_manage_mirror_list():
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('Mirror Name'), _('Creator'), _('Created Time')]
+    data = [App.query.order_by(db.asc(App.name)).first()]
+    return render_template('app_manage_mirror_list.html', title=_('Mirror Manage'),
+                           tableName=_('Mirror List'), AppAdmin=AppAdmin,
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/app_manage_mirror_list_add', methods=['GET', 'POST'])
+@login_required
+def app_manage_mirror_list_add():
+    form = AddTenantDatabaseForm(None)
+    if form.validate_on_submit():
+        current_tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
+        current_type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
+        db.session.add(TenantDb(id=None, hostname=form.host_name.data, driver=form.database_driver.data,
+                                username=form.user_name.data,
+                                password=generate_password_hash(form.user_password.data),
+                                database=form.database_name.data, port=form.database_port.data,
+                                aliasname='_'.join([form.database_driver.data, form.database_name.data]),
+                                type=current_type, tenant_id=current_tenant_id, app_id=session['current_selected_app_id']))
+        db.session.commit()
+        flash(_('New tenant database have been added.'))
+        return redirect(url_for('main.app_manage_mirror_list'))
+    elif request.method == 'GET':
+        form.app_name.data = session['current_selected_app_name']
+        form.host_name.data = 'localhost'
+        form.database_port.data = '3306'
+        form.database_driver.data = 'mysql'
+        form.user_name.data = 'root'
+        pass
+    return render_template('app_manage_mirror_list.html', title=_('Tenant Database Configure'),
+                           tableName=_('Add New Tenant Database'), form=form, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           addTitle=('Add New Tenant Database'))
+
+
+@bp.route('/app_manage_mirror_list_delete/<id>', methods=['GET', 'POST'])
+@login_required
+def app_manage_mirror_list_delete(id):
+    if request.method == 'GET':
+        session['current_delete_id'] = id
+    else:
+        data = request.get_json()
+        name = data.get('name')
+        if name == 'execute':
+            current_data = TenantDb.query.filter(TenantDb.id == session['current_delete_id']).first()
+            db.session.delete(current_data)
+            db.session.commit()
+            flash(_('Record have been deleted.'))
+            return jsonify({'result': 'success'})
+
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('Tenant'), _('Is System Extension'), _('Database'), _('IP'), _('Port')]
+    data = TenantDb.query.filter(TenantDb.app_id == session['current_selected_app_id']).order_by(
+        db.asc(TenantDb.username)).all()
+    confirmTitle = 'Confirm your choice:'
+    confirmMessage = 'Do you want to delete this record?'
+    return render_template('app_manage_mirror_list.html', title=_('Tenant Database List'),
+                           tableName=_('Tenant Database List'), Tenant=Tenant, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data,
+                           confirmTitle=confirmTitle, confirmMessage=confirmMessage)
+
+
+@bp.route('/app_manage_mirror_list_delete_select', methods=['GET', 'POST'])
+@login_required
+def app_manage_mirror_list_delete_select():
+        flash(_('Batch delete operation are not allowed now.'))
+        return redirect(url_for('main.app_manage_mirror_list'))
+
+
+@bp.route('/app_manage_mirror_list_edit/<id>', methods=['GET', 'POST'])
+@login_required
+def app_manage_mirror_list_edit(id):
+    if session.get('validate_alias_name'):
+        form = EditTenantDatabaseForm(session['validate_alias_name'])
+    else:
+        form = EditTenantDatabaseForm(None)
+    if form.validate_on_submit():
+        current_data = TenantDb.query.filter(TenantDb.id == id).first()
+        current_data.hostname = form.host_name.data
+        current_data.driver = form.database_driver.data
+        current_data.username = form.user_name.data
+        current_data.database = form.database_name.data
+        current_data.port = form.database_port.data
+        current_data.aliasname = '_'.join([form.database_driver.data, form.database_name.data])
+        current_data.type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
+        current_data.tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
+        current_data.app_id = session['current_selected_app_id']
+        if not form.user_password.data.strip() == '':
+            current_data.password = generate_password_hash(form.user_password.data)
+        db.session.commit()
+        flash(_('Tenant Database have been edited.'))
+        return redirect(url_for('main.app_manage_mirror_list'))
+    elif request.method == 'GET':
+        current_data = TenantDb.query.filter(TenantDb.id == id).first()
+        form.app_name.data = session['current_selected_app_name']
+        form.host_name.data = current_data.hostname
+        form.database_port.data = current_data.port
+        form.system_extension.data = 'System Extension' if current_data.type == 'system' else 'Not System Extension'
+        form.database_driver.data = current_data.driver
+        form.database_name.data = current_data.database
+        form.user_name.data = current_data.username
+        form.user_password.description = 'In edit mode, set null in this field means no modification for current password.'
+        session['validate_alias_name'] = '_'.join([form.database_driver.data, form.database_name.data])
+    return render_template('app_manage_mirror_list.html', title=_('Tenant Database Configure'),
+                           tableName=_('Edit Tenant Database'), form=form,app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           editTitle=('Edit Tenant Database'))
+
+
+# ---------------------------------------------------------------------------------------
+# app manage service deploy
+# ---------------------------------------------------------------------------------------
+@bp.route('/app_manage_service_deploy')
+@login_required
+def app_manage_service_deploy():
+    isCheck = True
+    isEdit = True
+    isDelete = False
+    session['is_delete'] = 'false'
+    tHead = [_('ID'), _('Mirror'), _('Instance Number'), _('State'), _('Action')]
+    action_list = [_('Publish'), _('Adjust'), _('Restart'), _('Stop'), _('Destroy')]
+    data = [App.query.order_by(db.asc(App.name)).first()]
+    return render_template('app_manage_service_deploy.html', title=_('Service Deploy'),
+                           tableName=_('Service List'), action_list=action_list,
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/app_manage_service_deploy_add', methods=['GET', 'POST'])
+@login_required
+def app_manage_service_deploy_add():
+    form = AddTenantDatabaseForm(None)
+    if form.validate_on_submit():
+        current_tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
+        current_type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
+        db.session.add(TenantDb(id=None, hostname=form.host_name.data, driver=form.database_driver.data,
+                                username=form.user_name.data,
+                                password=generate_password_hash(form.user_password.data),
+                                database=form.database_name.data, port=form.database_port.data,
+                                aliasname='_'.join([form.database_driver.data, form.database_name.data]),
+                                type=current_type, tenant_id=current_tenant_id, app_id=session['current_selected_app_id']))
+        db.session.commit()
+        flash(_('New tenant database have been added.'))
+        return redirect(url_for('main.app_manage_service_deploy'))
+    elif request.method == 'GET':
+        form.app_name.data = session['current_selected_app_name']
+        form.host_name.data = 'localhost'
+        form.database_port.data = '3306'
+        form.database_driver.data = 'mysql'
+        form.user_name.data = 'root'
+        pass
+    return render_template('app_manage_service_deploy.html', title=_('Tenant Database Configure'),
+                           tableName=_('Add New Tenant Database'), form=form, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           addTitle=('Add New Tenant Database'))
+
+
+@bp.route('/app_manage_service_deploy_delete/<id>', methods=['GET', 'POST'])
+@login_required
+def app_manage_service_deploy_delete(id):
+    if request.method == 'GET':
+        session['current_delete_id'] = id
+    else:
+        data = request.get_json()
+        name = data.get('name')
+        if name == 'execute':
+            current_data = TenantDb.query.filter(TenantDb.id == session['current_delete_id']).first()
+            db.session.delete(current_data)
+            db.session.commit()
+            flash(_('Record have been deleted.'))
+            return jsonify({'result': 'success'})
+
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('Tenant'), _('Is System Extension'), _('Database'), _('IP'), _('Port')]
+    data = TenantDb.query.filter(TenantDb.app_id == session['current_selected_app_id']).order_by(
+        db.asc(TenantDb.username)).all()
+    confirmTitle = 'Confirm your choice:'
+    confirmMessage = 'Do you want to delete this record?'
+    return render_template('app_manage_service_deploy.html', title=_('Tenant Database List'),
+                           tableName=_('Tenant Database List'), Tenant=Tenant, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data,
+                           confirmTitle=confirmTitle, confirmMessage=confirmMessage)
+
+
+@bp.route('/app_manage_service_deploy_delete_select', methods=['GET', 'POST'])
+@login_required
+def app_manage_service_deploy_delete_select():
+        flash(_('Batch delete operation are not allowed now.'))
+        return redirect(url_for('main.app_manage_service_deploy'))
+
+
+@bp.route('/app_manage_service_deploy_edit/<id>', methods=['GET', 'POST'])
+@login_required
+def app_manage_service_deploy_edit(id):
+    if session.get('validate_alias_name'):
+        form = EditTenantDatabaseForm(session['validate_alias_name'])
+    else:
+        form = EditTenantDatabaseForm(None)
+    if form.validate_on_submit():
+        current_data = TenantDb.query.filter(TenantDb.id == id).first()
+        current_data.hostname = form.host_name.data
+        current_data.driver = form.database_driver.data
+        current_data.username = form.user_name.data
+        current_data.database = form.database_name.data
+        current_data.port = form.database_port.data
+        current_data.aliasname = '_'.join([form.database_driver.data, form.database_name.data])
+        current_data.type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
+        current_data.tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
+        current_data.app_id = session['current_selected_app_id']
+        if not form.user_password.data.strip() == '':
+            current_data.password = generate_password_hash(form.user_password.data)
+        db.session.commit()
+        flash(_('Tenant Database have been edited.'))
+        return redirect(url_for('main.app_manage_service_deploy'))
+    elif request.method == 'GET':
+        current_data = TenantDb.query.filter(TenantDb.id == id).first()
+        form.app_name.data = session['current_selected_app_name']
+        form.host_name.data = current_data.hostname
+        form.database_port.data = current_data.port
+        form.system_extension.data = 'System Extension' if current_data.type == 'system' else 'Not System Extension'
+        form.database_driver.data = current_data.driver
+        form.database_name.data = current_data.database
+        form.user_name.data = current_data.username
+        form.user_password.description = 'In edit mode, set null in this field means no modification for current password.'
+        session['validate_alias_name'] = '_'.join([form.database_driver.data, form.database_name.data])
+    return render_template('app_manage_service_deploy.html', title=_('Tenant Database Configure'),
+                           tableName=_('Edit Tenant Database'), form=form,app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           editTitle=('Edit Tenant Database'))
+
+
+# ---------------------------------------------------------------------------------------
+# tenant service customize function
+# ---------------------------------------------------------------------------------------
+@bp.route('/tenant_service_customize_function')
+@login_required
+def tenant_service_customize_function():
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('App Name'), _('App ID'), _('Creator')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    # flash(_('Batch delete operation are not allowed now.'))
+    return render_template('tenant_service_customize_function.html', title=_('Customized Function'),
+                           tableName=_('Function Root'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/tenant_service_customize_function_edit')
+@login_required
+def tenant_service_customize_function_edit():
+    flash(_('You can only customize version!'))
+    return redirect(url_for('main.tenant_service_customize_function'))
+
+
+# ---------------------------------------------------------------------------------------
+# tenant service customize function
+# ---------------------------------------------------------------------------------------
+@bp.route('/tenant_service_role_setting')
+@login_required
+def tenant_service_role_setting():
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('Role Name'), _('Creator'), _('App Name')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    # flash(_('Batch delete operation are not allowed now.'))
+    return render_template('tenant_service_role_setting.html', title=_('Customer List'),
+                           tableName=_('Role List'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/tenant_service_role_setting_add', methods=['GET', 'POST'])
+@login_required
+def tenant_service_role_setting_add():
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('App Name'), _('App ID'), _('Creator')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    # flash(_('Batch delete operation are not allowed now.'))
+    return render_template('tenant_service_role_setting.html', title=_('Customer List'),
+                           tableName=_('Role List'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/tenant_service_role_setting_delete/<id>', methods=['GET', 'POST'])
+@login_required
+def tenant_service_role_setting_delete(id):
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('App Name'), _('App ID'), _('Creator')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    # flash(_('Batch delete operation are not allowed now.'))
+    return render_template('tenant_service_role_setting.html', title=_('Customer List'),
+                           tableName=_('Role List'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+
+@bp.route('/tenant_service_role_setting_delete_select', methods=['GET', 'POST'])
+@login_required
+def tenant_service_role_setting_delete_select():
+        flash(_('Batch delete operation are not allowed now.'))
+        return redirect(url_for('main.tenant_service_role_setting'))
+
+
+@bp.route('/tenant_service_role_setting_edit')
+@login_required
+def tenant_service_role_setting_edit():
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('App Name'), _('App ID'), _('Creator')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    # flash(_('Batch delete operation are not allowed now.'))
+    return render_template('tenant_service_role_setting.html', title=_('Customer List'),
+                           tableName=_('Role List'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+# ---------------------------------------------------------------------------------------
+# tenant service customize function
+# ---------------------------------------------------------------------------------------
+@bp.route('/tenant_service_user_setting')
+@login_required
+def tenant_service_user_setting():
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('User Name'), _('Belonged Role'), _('Creator'), _('App Name')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    # flash(_('Batch delete operation are not allowed now.'))
+    return render_template('tenant_service_user_setting.html', title=_('Customer List'),
+                           tableName=_('User List'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/tenant_service_user_setting_add', methods=['GET', 'POST'])
+@login_required
+def tenant_service_user_setting_add():
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('User Name'), _('Belonged Role'), _('Creator'), _('App Name')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    # flash(_('Batch delete operation are not allowed now.'))
+    return render_template('tenant_service_user_setting.html', title=_('Customer List'),
+                           tableName=_('User List'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/tenant_service_user_setting_delete/<id>', methods=['GET', 'POST'])
+@login_required
+def tenant_service_user_setting_delete(id):
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('App Name'), _('App ID'), _('Creator')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    # flash(_('Batch delete operation are not allowed now.'))
+    return render_template('tenant_service_user_setting.html', title=_('Customer List'),
+                           tableName=_('User List'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+
+@bp.route('/tenant_service_user_setting_delete_select', methods=['GET', 'POST'])
+@login_required
+def tenant_service_user_setting_delete_select():
+        flash(_('Batch delete operation are not allowed now.'))
+        return redirect(url_for('main.tenant_service_user_setting'))
+
+
+@bp.route('/tenant_service_user_setting_edit')
+@login_required
+def tenant_service_user_setting_edit():
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('App Name'), _('App ID'), _('Creator')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    # flash(_('Batch delete operation are not allowed now.'))
+    return render_template('tenant_service_user_setting.html', title=_('Customer List'),
+                           tableName=_('User List'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isDelete=isDelete, tHead=tHead, data=data)

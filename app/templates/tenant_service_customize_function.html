@@ -1,0 +1,222 @@
+{% extends "tenant_service_base.html" %}
+{% import "_wtf.html" as _wtf %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="../static/jstree/dist/themes/default/style.min.css">
+    <script src="../static/pinyin4js/dist/pinyin4js.js"></script>
+{% endblock %}
+
+{% block subtitle2 %}
+    <a href={{ url_for('main.index_tenant') }}>
+        {{ _('Tenant Service') }}
+    </a>
+    /
+    <a style="color: dodgerblue;" href={{ url_for('main.tenant_service_customize_function') }}>
+        {{ title }}
+    </a>
+{% endblock %}
+
+{% block app_content %}
+    {% if form %}
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>
+                    <span class="icon fa fa-pencil" style="padding: 10px"></span>
+                    <span class="title h3">{{ tableName }}</span>
+                    <a href={{ url_for('main.tenant_service_customize_function') }}>
+                        <span style="float: right; padding: 10px; padding-right: 27px"
+                              class="icon fa fa-cloud-upload fa-fw"></span>
+                    </a>
+                    <button style="float: right;" class="btn btn-info btn-xs" onclick="submitForm()">
+                        <span class="icon fa fa-save fa-fw"></span>
+                    </button>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th>
+                    {{ _wtf.quick_form(form, form_type='horizontal') }}
+                </th>
+            </tr>
+            </tbody>
+        </table>
+        <br>
+    {% endif %}
+    {% if not form %}
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>
+                    <span class="icon fa fa-bars" style="padding: 10px"></span>
+                    <span class="title h3">{{ tableName }}</span>
+                    <a href={{ url_for('main.tenant_service_customize_function') }}>
+                        <span style="float: right; padding: 10px; padding-right: 27px;"
+                              class="icon fa fa-refresh fa-fw"></span>
+                    </a>
+                    <a href={{ url_for('main.tenant_service_customize_function_edit') }}>
+                        <span style="float: right; padding: 10px;"
+                              class="icon fa fa-pencil fa-fw">
+                        </span>
+                    </a>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th>
+                    <div class="container-fluid">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-cubes"></i>
+                                    {{ _('Software Version') }}
+                                    <i class="fa fa-caret-right"></i>
+                                    {{ _('Function Package') }}
+                                    <i class="fa fa-caret-right"></i>
+                                    {{ _('Atomic Function') }}
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div id="jstree_demo_1" class="demo jstree jstree-1 jstree-default" role="tree"
+                                         aria-multiselectable="true" tabindex="0" aria-activedescendant="Root"
+                                         aria-busy="false">
+                                        <ul class="jstree-container-ul jstree-children jstree-striped jstree-contextmenu jstree-wholerow-ul jstree-no-dots"
+                                            role="group">
+                                            <li role="treeitem" aria-selected="false" aria-level="1"
+                                                aria-labelledby="Root_anchor" aria-expanded="false" id="Root"
+                                                class="jstree-node  jstree-closed jstree-last">
+                                                <div unselectable="on" role="presentation" class="jstree-wholerow">
+                                                    &nbsp;</div>
+                                                <i class="jstree-icon jstree-ocl" role="presentation"></i><a
+                                                    class="jstree-anchor" href="#" tabindex="-1" id="Root_anchor"><i
+                                                    class="jstree-icon jstree-themeicon"
+                                                    role="presentation"></i>Root</a></li>
+                                        </ul>
+                                    </div>
+                                    <div id="jstree_demo_1_init_btn" style="display: none;padding-left: 20px">
+                                        <button type="button" class="btn btn-success"
+                                                onclick="init(&quot;version2package&quot;)">{{ _('Initial') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="../static/jstree/dist/jstree.min.js"></script>
+    <script type="text/javascript">
+        function submitForm() {
+            $('#submitButton').click()
+        }
+
+        function confirm() {
+            var data = {
+                'name': 'execute'
+            };
+{#            $.ajax({#}
+{#                type: 'POST',#}
+{#                url: '{{url_for("main.app_manage_database_configure_delete", id=0)}}',#}
+{#                data: JSON.stringify(data),  //转变传递的参数为字符串格式#}
+{#                contentType: 'application/json; charset=UTF-8', //指定传递给服务器的是Json格式数据#}
+{#                dataType: 'json',//希望服务器返回json格式的数据#}
+{#                success: function (data) {#}
+{#                    $('#closeConfirmMessage').click();#}
+                    {#                    window.location.reload()#}
+{#                    window.location.href = '/app_manage_database_configure'#}
+{#                }#}
+{#            });#}
+        }
+
+        function selectStateChange(objName) {
+            index = {"selectCheckbox": 0};
+            var me = document.getElementsByName("selectCheckbox")[index["selectCheckbox"]].checked;
+            var objNameList = document.getElementsByName(objName);
+            var i = 0;
+            if (null != objNameList) {
+                {#                alert("全选操作");#}
+                if (me == true)
+                    for (i = 0; i < objNameList.length; i++) {
+                        objNameList[i].checked = true;
+                    }
+                else {
+                    for (i = 0; i < objNameList.length; i++) {
+                        objNameList[i].checked = false;
+                    }
+                }
+            }
+        }
+
+        function changeAppListMenu() {
+            var app_list_menu = $("#app_list_menu");
+            var value = app_list_menu.attr("class");
+            if (value.indexOf("open") >= 0) {
+                app_list_menu.removeClass("open")
+            }
+            else {
+                app_list_menu.addClass("open")
+            }
+        }
+    </script>
+    <script type="text/javascript">
+{#        var versionToFunctionFileName = "../static/upload-conf-tenant/43a3097cf9bbefaa92cb31673257db0c/21232f297a57a5a743894a0e4a801fc3//version2function.json";#}
+        var versionToFunctionFileName = "../static/upload/upload-conf-tenant/test/test//version2function.json";
+        if (versionToFunctionFileName) {
+            buildTree('jstree_demo_1', versionToFunctionFileName + "?number=" + Math.random());
+        }
+
+        function buildTree(id, url) {
+            $('#' + id).jstree({
+                "core": {
+                    "animation": 0,
+                    "check_callback": true,
+                    "themes": {"stripes": true},
+                    'data': {
+                        'url': function (node) {
+                            return url;
+                        },
+{#                        'data': function (node) {#}
+{#                            return {'id': node.id};#}
+{#                        }#}
+                        "dataType" : "json"
+                    }
+                },
+                "types": {
+                    "#": {
+                        "max_children": 1,
+                        "max_depth": 10,
+                        "valid_children": ["root"]
+                    },
+                    "root": {
+                        "valid_children": ["default"]
+                    },
+                    "default": {
+                        "valid_children": ["default", "file"]
+                    },
+                    "file": {
+                        "valid_children": []
+                    }
+                },
+                "plugins": [
+                    "dnd", "search",
+                    "state", "types", "wholerow"
+                ]
+            }).bind("ready.jstree", function (event, data) {
+                $('#' + id).jstree(true).deselect_all();
+            });
+        }
+
+    </script>
+{% endblock %}
+
+

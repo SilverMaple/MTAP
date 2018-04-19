@@ -1,41 +1,4 @@
-{% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
-
-{% block subtitle1 %}
-    {{ _('Registe Manage') }}
-{% endblock %}
-
-{% block subtitle2 %}
-    {{ _('Registe Manage') }}
-{% endblock %}
-
-{% block subnavbar %}
-    <li class="active">
-        <a href={{ url_for('main.index_registe') }}>
-            <span class="icon fa fa-tachometer"></span><span class="title">{{  _('Dashboard') }}</span>
-        </a>
-    </li>
-    <li>
-        <a href={{ url_for('main.registe_manage_app_setting') }}>
-            <span class="icon fa fa-cog fa-fw"></span><span class="title">{{ _('App Setting') }}</span>
-        </a>
-    </li>
-    <li>
-        <a href={{ url_for('main.registe_manage_app_extension') }}>
-            <span class="icon fa fa-external-link fa-fw"></span><span class="title">{{ _('App Extension') }}</span>
-        </a>
-    </li>
-    <li>
-        <a href={{ url_for('main.registe_manage_app_manager_setting') }}>
-            <span class="icon fa fa-user fa-fw"></span><span class="title">{{ _('App Manager Setting') }}</span>
-        </a>
-    </li>
-    <li>
-        <a href={{ url_for('main.registe_manage_app_tenant_setting') }}>
-            <span class="icon fa fa-users fa-fw"></span><span class="title">{{ _('App Tenant Setting') }}</span>
-        </a>
-    </li>
-{% endblock %}
+{% extends "registe_manage_base.html" %}
 
 {% block app_content %}
     <p>Registe Manage</p>

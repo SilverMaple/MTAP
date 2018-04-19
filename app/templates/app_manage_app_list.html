@@ -1,0 +1,115 @@
+{% extends "app_manage_base.html" %}
+{% import "_wtf.html" as _wtf%}
+
+{% block subtitle2 %}
+    <a href={{ url_for('main.index_app') }}>
+        {{ _('App Manage') }}
+    </a>
+    /
+    <a style="color: dodgerblue;" href={{ url_for('main.app_manage_app_list') }}>
+        {{  title }}
+    </a>
+{% endblock %}
+
+{% block app_content %}
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    <span class="icon fa fa-bars" style="padding: 10px"></span>
+                    <span class="title h3">{{  tableName }}</span>
+                    <a href={{ url_for('main.app_manage_app_list') }}>
+                        <span style="float: right; padding: 10px; padding-right: 27px;" class="icon fa fa-refresh fa-fw"></span>
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                {% if isCheck %}
+                                <th width="10px">
+                                    <input type="checkbox" name="selectCheckbox" title=""
+                                           onchange="selectStateChange('checkbox')">
+                                </th>
+                                {% endif %}
+                                {% for t in tHead %}
+                                <th>{{ t }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in data %}
+                                <tr>
+                                    {% if isCheck %}
+                                    <th><input type="checkbox" name="checkbox" title="" value="d.id"></th>
+                                    {% endif %}
+                                    <th>{{ d.name }}</th>
+                                    <th>{{ d.appid }}</th>
+                                    <th>
+                                        {% if not AppAdmin.query.filter(AppAdmin.id==d.creater_id).first().name %}
+                                            {{ _('System') }}
+                                        {% else %}
+                                            {{ AppAdmin.query.filter(AppAdmin.id==d.creater_id).first().name }}
+                                        {% endif %}
+                                    </th>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </th>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript">
+        function submitForm(){
+            $('#submitButton').click()
+        }
+
+{#        function confirm() {#}
+{#            var data={#}
+{#                'name':'execute'#}
+{#            };#}
+{#            $.ajax({#}
+{#                type:'POST',#}
+{#                url:'{{url_for("main.registe_manage_app_setting_delete", id=0)}}',#}
+{#                data:JSON.stringify(data),  //转变传递的参数为字符串格式#}
+{#                contentType:'application/json; charset=UTF-8', //指定传递给服务器的是Json格式数据#}
+{#                dataType:'json',//希望服务器返回json格式的数据#}
+{#                success:function(data){#}
+{#                    $('#closeConfirmMessage').click();#}
+{#                    window.location.reload()#}
+{#                    window.location.href = '/registe_manage_app_setting'#}
+{#                }#}
+{#            });#}
+{#        }#}
+
+        function selectStateChange(objName){
+            index = {"selectCheckbox": 0};
+            var me = document.getElementsByName("selectCheckbox")[index["selectCheckbox"]].checked;
+            var objNameList=document.getElementsByName(objName);
+            var i = 0;
+            if(null!=objNameList){
+{#                alert("全选操作");#}
+                if (me == true)
+                    for(i=0;i<objNameList.length;i++){
+                        objNameList[i].checked=true;
+                    }
+                else {
+                    for(i=0;i<objNameList.length;i++){
+                        objNameList[i].checked=false;
+                    }
+                }
+            }
+        }
+    </script>
+{% endblock %}
+
+

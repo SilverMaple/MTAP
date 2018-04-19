@@ -1,0 +1,522 @@
+[
+	{
+		"data": {},
+		"icon": true,
+		"id": "wanzhengban",
+		"parent": "#",
+		"text": "完整版",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"item_pattern": "/\\(\u003ca.*API管理.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "APIguanli",
+		"parent": "wanzhengban",
+		"text": "API管理",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/api.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiController).List"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/api.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiController).Show"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/api.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiController).Table"
+				}
+			],
+			"item_pattern": "/\u003cdd\u003e/,/\u003c\\/dd\u003e/{x;/\\(\u003cdd\u003e.*API接口.*\u003c\\/dd\u003e\\)/{p;q};/\u003cdd\u003e.*\u003c\\/dd\u003e/{x;h;d;ta};/\u003cdd\u003e.*/{x;H;ta};{x;h;d}};:a"
+		},
+		"icon": true,
+		"id": "APIjiekou",
+		"parent": "APIguanli",
+		"text": "API接口",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/api/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/api.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiController).Add"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*新增资源.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xinzengziyuan",
+		"parent": "APIjiekou",
+		"text": "新增资源",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/api/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/api.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiController).Edit"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/api.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiController).AjaxSave"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*编辑.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xiugaiziyuan",
+		"parent": "APIjiekou",
+		"text": "修改资源",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/api/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/api.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiController).AjaxDel"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*删除.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "shanchuziyuan",
+		"parent": "APIjiekou",
+		"text": "删除资源",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/api/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/api.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiController).AddApi"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*添加.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xinzengjiekou",
+		"parent": "APIjiekou",
+		"text": "新增接口",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/api/info.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/api.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiController).EditApi"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/api.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiController).AjaxApiSave"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*edit_api.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xiugaijiekou",
+		"parent": "APIjiekou",
+		"text": "修改接口",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/apimonitor.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.ApiMonitorController).List"
+				}
+			],
+			"item_pattern": "/\u003cdd\u003e/,/\u003c\\/dd\u003e/{x;/\\(\u003cdd\u003e.*API监控.*\u003c\\/dd\u003e\\)/{p;q};/\u003cdd\u003e.*\u003c\\/dd\u003e/{x;h;d;ta};/\u003cdd\u003e.*/{x;H;ta};{x;h;d}};:a"
+		},
+		"icon": true,
+		"id": "APIjiankong",
+		"parent": "APIguanli",
+		"text": "API监控",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "jiankong",
+		"parent": "APIjiankong",
+		"text": "监控",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"item_pattern": "/\\(\u003ca.*基础设置.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "jichushezhi",
+		"parent": "wanzhengban",
+		"text": "基础设置",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/group.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.GroupController).List"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/group.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.GroupController).Table"
+				}
+			],
+			"item_pattern": "/\u003cdd\u003e/,/\u003c\\/dd\u003e/{x;/\\(\u003cdd\u003e.*分组设置.*\u003c\\/dd\u003e\\)/{p;q};/\u003cdd\u003e.*\u003c\\/dd\u003e/{x;h;d;ta};/\u003cdd\u003e.*/{x;H;ta};{x;h;d}};:a"
+		},
+		"icon": true,
+		"id": "fenzushezhi",
+		"parent": "jichushezhi",
+		"text": "分组设置",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/group/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/group.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.GroupController).Add"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*新增.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xinzengfenzu",
+		"parent": "fenzushezhi",
+		"text": "新增分组",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/group/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/group.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.GroupController).Edit"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/group.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.GroupController).AjaxSave"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*编辑.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xiugaifenzu",
+		"parent": "fenzushezhi",
+		"text": "修改分组",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/group/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/group.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.GroupController).AjaxDel"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*删除.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "shanchufenzu",
+		"parent": "fenzushezhi",
+		"text": "删除分组",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/env.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.EnvController).List"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/env.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.EnvController).Table"
+				}
+			],
+			"item_pattern": "/\u003cdd\u003e/,/\u003c\\/dd\u003e/{x;/\\(\u003cdd\u003e.*环境设置.*\u003c\\/dd\u003e\\)/{p;q};/\u003cdd\u003e.*\u003c\\/dd\u003e/{x;h;d;ta};/\u003cdd\u003e.*/{x;H;ta};{x;h;d}};:a"
+		},
+		"icon": true,
+		"id": "huanjingshezhi",
+		"parent": "jichushezhi",
+		"text": "环境设置",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/env/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/env.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.EnvController).Add"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*新增.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xinzenghuanjing",
+		"parent": "huanjingshezhi",
+		"text": "新增环境",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/env/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/env.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.EnvController).Edit"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/env.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.EnvController).AjaxSave"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*编辑.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xiugaihuanjing",
+		"parent": "huanjingshezhi",
+		"text": "修改环境",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/env/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/env.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.EnvController).AjaxDel"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*删除.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "shanchuhuanjing",
+		"parent": "huanjingshezhi",
+		"text": "删除环境",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/code.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.CodeController).List"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/code.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.CodeController).Table"
+				}
+			],
+			"item_pattern": "/\u003cdd\u003e/,/\u003c\\/dd\u003e/{x;/\\(\u003cdd\u003e.*状态码设置.*\u003c\\/dd\u003e\\)/{p;q};/\u003cdd\u003e.*\u003c\\/dd\u003e/{x;h;d;ta};/\u003cdd\u003e.*/{x;H;ta};{x;h;d}};:a"
+		},
+		"icon": true,
+		"id": "zhuangtaimashezhi",
+		"parent": "jichushezhi",
+		"text": "状态码设置",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/code/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/code.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.CodeController).Add"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*新增.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xinzengzhuangtaima",
+		"parent": "zhuangtaimashezhi",
+		"text": "新增状态码",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/code/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/code.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.CodeController).Edit"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/code.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.CodeController).AjaxSave"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*编辑.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xiugaizhuangtaima",
+		"parent": "zhuangtaimashezhi",
+		"text": "修改状态码",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/code/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/code.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.CodeController).AjaxDel"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*删除.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "shanchuzhuangtaima",
+		"parent": "zhuangtaimashezhi",
+		"text": "删除状态码",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"item_pattern": "/\\(\u003ca.*人员管理.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "renyuanguanli",
+		"parent": "wanzhengban",
+		"text": "人员管理",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/admin.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.AdminController).List"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/admin.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.AdminController).Table"
+				}
+			],
+			"item_pattern": "/\u003cdd\u003e/,/\u003c\\/dd\u003e/{x;/\\(\u003cdd\u003e.*管理员.*\u003c\\/dd\u003e\\)/{p;q};/\u003cdd\u003e.*\u003c\\/dd\u003e/{x;h;d;ta};/\u003cdd\u003e.*/{x;H;ta};{x;h;d}};:a"
+		},
+		"icon": true,
+		"id": "guanliyuan",
+		"parent": "renyuanguanli",
+		"text": "管理员",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/admin/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/admin.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.AdminController).Add"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*新增.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xinzengguanliyuan",
+		"parent": "guanliyuan",
+		"text": "新增管理员",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/admin/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/admin.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.AdminController).Edit"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/admin.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.AdminController).AjaxSave"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*编辑.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "xiugaiguanliyuan",
+		"parent": "guanliyuan",
+		"text": "修改管理员",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/admin/list.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/admin.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.AdminController).AjaxDel"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*删除.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "shanchuguanliyuan",
+		"parent": "guanliyuan",
+		"text": "删除管理员",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"item_pattern": "/\\(\u003ca.*个人中心.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "gerenzhongxin",
+		"parent": "wanzhengban",
+		"text": "个人中心",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./views/public/main.html",
+			"func_entry": [
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/user.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.UserController).Edit"
+				},
+				{
+					"file": "github.com/george518/PPGo_ApiAdmin/controllers/user.go",
+					"func": "(*github.com/george518/PPGo_ApiAdmin/controllers.UserController).AjaxSave"
+				}
+			],
+			"item_pattern": "/\\(\u003ca.*资料修改.*\u003c\\/a\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "ziliaoxiugai",
+		"parent": "gerenzhongxin",
+		"text": "资料修改",
+		"type": "default"
+	}
+]

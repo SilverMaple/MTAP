@@ -1,0 +1,423 @@
+{% extends "app_manage_base.html" %}
+{% import "_wtf.html" as _wtf %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="../static/jstree/dist/themes/default/style.min.css">
+    <script src="../static/pinyin4js/dist/pinyin4js.js"></script>
+{% endblock %}
+
+{% block subtitle2 %}
+    <a href={{ url_for('main.index_app') }}>
+        {{ _('App Manage') }}
+    </a>
+    /
+    <a style="color: dodgerblue;" href={{ url_for('main.app_manage_function_configure') }}>
+        {{ title }}
+    </a>
+{% endblock %}
+
+{% block app_content %}
+    {% if form %}
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>
+                    <span class="icon fa fa-pencil" style="padding: 10px"></span>
+                    <span class="title h3">{{ tableName }}</span>
+                    <a href={{ url_for('main.app_manage_function_configure') }}>
+                        <span style="float: right; padding: 10px; padding-right: 27px"
+                              class="icon fa fa-cloud-upload fa-fw"></span>
+                    </a>
+                    <button style="float: right;" class="btn btn-info btn-xs" onclick="submitForm()">
+                        <span class="icon fa fa-save fa-fw"></span>
+                    </button>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th>
+                    {{ _wtf.quick_form(form, form_type='horizontal') }}
+                </th>
+            </tr>
+            </tbody>
+        </table>
+        <br>
+    {% endif %}
+    {% if not form %}
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>
+                    <span class="icon fa fa-bars" style="padding: 10px"></span>
+                    <span class="title h3">{{ tableName }}</span>
+                    <a href={{ url_for('main.app_manage_function_configure') }}>
+                        <span style="float: right; padding: 10px; padding-right: 27px;"
+                              class="icon fa fa-refresh fa-fw"></span>
+                    </a>
+                    <a href={{ url_for('main.app_manage_function_configure') }}>
+                        <span style="float: right; padding: 10px; padding-right: 27px"
+                              class="icon fa fa-cloud-upload fa-fw"></span>
+                    </a>
+                    <button style="float: right;" class="btn btn-info btn-xs" onclick="submitForm()">
+                        <span class="icon fa fa-save fa-fw"></span>
+                    </button>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th>
+                    <div class="container-fluid">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-cubes"></i>
+                                    {{ _('Software Version') }}
+                                    <i class="fa fa-caret-right"></i>
+                                    {{ _('Function Package') }}
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div id="jstree_demo_1" class="demo jstree jstree-1 jstree-default" role="tree"
+                                         aria-multiselectable="true" tabindex="0" aria-activedescendant="Root"
+                                         aria-busy="false">
+                                        <ul class="jstree-container-ul jstree-children jstree-striped jstree-contextmenu jstree-wholerow-ul jstree-no-dots"
+                                            role="group">
+                                            <li role="treeitem" aria-selected="false" aria-level="1"
+                                                aria-labelledby="Root_anchor" aria-expanded="false" id="Root"
+                                                class="jstree-node  jstree-closed jstree-last">
+                                                <div unselectable="on" role="presentation" class="jstree-wholerow">
+                                                    &nbsp;</div>
+                                                <i class="jstree-icon jstree-ocl" role="presentation"></i><a
+                                                    class="jstree-anchor" href="#" tabindex="-1" id="Root_anchor"><i
+                                                    class="jstree-icon jstree-themeicon"
+                                                    role="presentation"></i>Root</a></li>
+                                        </ul>
+                                    </div>
+                                    <div id="jstree_demo_1_init_btn" style="display: none;padding-left: 20px">
+                                        <button type="button" class="btn btn-success"
+                                                onclick="init(&quot;version2package&quot;)">{{ _('Initial') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th>
+                    <div class="container-fluid">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-cubes"></i>
+                                    {{ _('Function Package') }}
+                                    <i class="fa fa-caret-right"></i>
+                                    {{ _('Software Version') }}
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div id="jstree_demo_2" class="demo jstree jstree-2 jstree-default" role="tree"
+                                         aria-multiselectable="true" tabindex="0" aria-activedescendant="root"
+                                         aria-busy="false">
+                                        <ul class="jstree-container-ul jstree-children jstree-striped jstree-contextmenu jstree-wholerow-ul jstree-no-dots"
+                                            role="group">
+                                            <li role="treeitem" aria-selected="false" aria-level="1"
+                                                aria-labelledby="root_anchor" aria-expanded="false" id="root"
+                                                class="jstree-node  jstree-closed jstree-last">
+                                                <div unselectable="on" role="presentation" class="jstree-wholerow">
+                                                    &nbsp;</div>
+                                                <i class="jstree-icon jstree-ocl" role="presentation"></i><a
+                                                    class="jstree-anchor" href="#" tabindex="-1" id="root_anchor"><i
+                                                    class="jstree-icon jstree-themeicon"
+                                                    role="presentation"></i>Root</a></li>
+                                        </ul>
+                                    </div>
+                                    <div id="jstree_demo_2_init_btn" style="display: none;padding-left: 20px">
+                                        <button type="button" class="btn btn-success"
+                                                onclick="init(&quot;package2function&quot;)">初始化
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="../static/jstree/dist/jstree.min.js"></script>
+    <script type="text/javascript">
+        function submitForm() {
+            $('#submitButton').click()
+        }
+
+        function confirm() {
+            var data = {
+                'name': 'execute'
+            };
+            $.ajax({
+                type: 'POST',
+                url: '{{url_for("main.app_manage_database_configure_delete", id=0)}}',
+                data: JSON.stringify(data),  //转变传递的参数为字符串格式
+                contentType: 'application/json; charset=UTF-8', //指定传递给服务器的是Json格式数据
+                dataType: 'json',//希望服务器返回json格式的数据
+                success: function (data) {
+                    $('#closeConfirmMessage').click();
+                    {#                    window.location.reload()#}
+                    window.location.href = '/app_manage_database_configure'
+                }
+            });
+        }
+
+        function selectStateChange(objName) {
+            index = {"selectCheckbox": 0};
+            var me = document.getElementsByName("selectCheckbox")[index["selectCheckbox"]].checked;
+            var objNameList = document.getElementsByName(objName);
+            var i = 0;
+            if (null != objNameList) {
+                {#                alert("全选操作");#}
+                if (me == true)
+                    for (i = 0; i < objNameList.length; i++) {
+                        objNameList[i].checked = true;
+                    }
+                else {
+                    for (i = 0; i < objNameList.length; i++) {
+                        objNameList[i].checked = false;
+                    }
+                }
+            }
+        }
+
+        function changeAppListMenu() {
+            var app_list_menu = $("#app_list_menu");
+            var value = app_list_menu.attr("class");
+            if (value.indexOf("open") >= 0) {
+                app_list_menu.removeClass("open")
+            }
+            else {
+                app_list_menu.addClass("open")
+            }
+        }
+    </script>
+    <script>
+        var versionToPackageFileName = "../static/upload/upload_conf_app/test//version2package.json";
+        var packageToFunctionFileName = "../static/upload/upload_conf_app/test//package2function.json";
+{#        var versionToPackageFileName = "../static/upload-conf-app/43a3097cf9bbefaa92cb31673257db0c//version2package.json";#}
+{#        var packageToFunctionFileName = "../static/upload-conf-app/43a3097cf9bbefaa92cb31673257db0c//package2function.json";#}
+        var jstree_demo_1_inited = false;
+        var jstree_demo_2_inited = false;
+
+        if (versionToPackageFileName) {
+            buildTree('jstree_demo_1', 'jstree_demo_2', versionToPackageFileName + "?number=" + Math.random());
+            jstree_demo_1_inited = true;
+            console.log('build version ok')
+        } else {
+            document.getElementById("jstree_demo_1_init_btn").style.display = "block";
+        }
+
+        if (packageToFunctionFileName) {
+            buildTree('jstree_demo_2', 'jstree_demo_1', packageToFunctionFileName + "?number=" + Math.random());
+            jstree_demo_2_inited = true;
+            console.log('build package ok')
+        } else {
+            document.getElementById("jstree_demo_2_init_btn").style.display = "block";
+        }
+
+        function buildTree(id, anotherId, url) {
+
+
+            var defaultItem = $.jstree.defaults.contextmenu.items();
+            var items = defaultItem;
+            items["Setting"] = {
+                "separator_before": true,
+                "separator_after": false,
+                "label": "Setting",
+                "action": function (data) {
+                    var inst = $.jstree.reference(data.reference);
+                    var node = inst.get_node(data.reference);
+                    $('#file_path').val(node.data.file_path);
+                    $('#item_pattern').val(node.data.item_pattern);
+                    $('#settingModal0').modal('show');
+                    $('#setting_save').unbind("click");
+                    $('#setting_save').bind("click", node.id, function (e) {
+                        var id = e.data;
+                        var obj = $('#' + id).jstree(true).get_node({id: id});
+                        obj.data = new Object();
+                        obj.data.file_path = $('#file_path').val();
+                        obj.data.item_pattern = $('#item_pattern').val();
+                        $('#settingModal0').modal('hide');
+                    });
+                }
+            };
+            console.log('setting ok');
+            $('#' + id).jstree({
+                "core": {
+                    "animation": 0,
+                    "check_callback": true,
+                    "themes": {"stripes": true},
+                    'data': {
+                        'url': function (node) {
+                            return url;
+                        },
+{#                        'data': function (node) {#}
+{#                            return {'id': node.id};#}
+{#                        }#}
+{#                        "url" : url,#}
+                        "dataType" : "json"
+                    }
+                },
+                "types": {
+                    "#": {
+                        "max_children": 1,
+                        "max_depth": 10,
+                        "valid_children": ["root"]
+                    },
+                    "root": {
+                        "valid_children": ["default"]
+                    },
+                    "default": {
+                        "valid_children": ["default", "file"]
+                    },
+                    "file": {
+                        "valid_children": []
+                    }
+                },
+                "contextmenu": {items},
+                "plugins": [
+                    "contextmenu", "dnd", "search",
+                    "state", "types", "wholerow"
+                ]
+            }).bind("rename_node.jstree", function (event, data) {
+                console.log(PinyinHelper.convertToPinyinString(data.node.text, '', PinyinFormat.WITHOUT_TONE));
+                var new_id = PinyinHelper.convertToPinyinString(data.node.text, '', PinyinFormat.WITHOUT_TONE).trim().replace(/\s/g, "");
+                $('#' + id).jstree(true).set_id(data.node, new_id);
+            }).bind("ready.jstree", function (event, data) {
+                $('#' + id).jstree(true).deselect_all();
+            }).bind("select_node.jstree", function (event, data) {
+                $('#' + anotherId).jstree(true).deselect_all();
+            });
+        }
+
+{##}
+{#        function init(tag) {#}
+{#            var url = "/app/tools/onlineconf/init";#}
+{#            $.post(url, {"tag": tag}, function (data) {#}
+{#                if (data.code == 0) {#}
+{#                    window.location.href = "/app/tools/onlineconf/index"#}
+{#                } else {#}
+{#                    alert(data.message)#}
+{#                }#}
+{#            });#}
+{#        }#}
+
+
+        function save() {
+            var callback = function () {
+                if (jstree_demo_2_inited) {
+                    save2('jstree_demo_2', "package2function", "/app/tools/onlineconf/save" + "?number=" + Math.random(),
+                            function () {
+                                window.location.href = "/app/tools/onlineconf/index";
+                            });
+                }
+            }
+            if (jstree_demo_1_inited) {
+                save2('jstree_demo_1', "version2package", "/app/tools/onlineconf/save" + "?number=" + Math.random(), callback);
+            }
+        }
+
+
+        function save2(id, tag, url, callback) {
+            var v = $('#' + id).jstree(true).get_json("#", {
+                "flat": true,
+                "no_a_attr": true,
+                "no_li_attr": true,
+                "no_state": true,
+                "no_data": false
+            });
+            for (var i = 0; i < v.length; i++) {
+
+                if (typeof(v[i].data) != "object") {
+                    v[i].data = {};
+                }
+            }
+            var json = JSON.stringify(v);
+            $.post(url, {"tag": tag, "json": json}, function (data) {
+                if (data.code == 0) {
+                    if (callback) {
+                        callback();
+                    }
+                } else {
+                    alert(data.message)
+                }
+            });
+        }
+
+
+        function upload() {
+            $('#funcModal0').modal('show');
+        }
+
+
+        function startUploading() {
+            var vFD = new FormData(document.getElementById('upload_form'));
+
+            var oXHR = new XMLHttpRequest();
+            oXHR.addEventListener('load', uploadFinish, false);
+            oXHR.open('POST', "/app/tools/onlineconf/upload");
+            oXHR.send(vFD);
+        }
+
+        function uploadFinish(e) {
+            alert(e.target.responseText);
+            $('#funcModal0').modal('hide');
+            window.location.href = "/app/tools/onlineconf/index";
+        }
+
+
+        function test() {
+            $('#testModal0').modal('show');
+        }
+
+
+        function startTesting() {
+            var vFD = new FormData(document.getElementById('test_upload_form'));
+            var oXHR = new XMLHttpRequest();
+            oXHR.addEventListener('load', testFinish, false);
+            oXHR.open('POST', "/app/tools/onlineconf/test");
+            oXHR.send(vFD);
+        }
+
+        function testFinish(e) {
+            var text = JSON.parse(e.target.responseText);
+            if (text.code == 0) {
+                var path = text.message;
+                $.get("/" + path, function (result) {
+                    $('#result-textarea').text(result);
+                    removeTestFile(path);
+                });
+            } else {
+                $('#result-textarea').text(text.message);
+            }
+
+
+            $('#testResultModal0').modal('show');
+        }
+
+        function removeTestFile(file) {
+            $.post("/app/tools/onlineconf/removetestfile", {"file": file}, function (data) {
+                console.log(data.message)
+            });
+        }
+    </script>
+{% endblock %}
+
+

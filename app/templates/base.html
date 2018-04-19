@@ -38,7 +38,7 @@
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('main.index') }}">{{ _('Home') }}</a></li>
                     <li><a href="{{ url_for('main.index_registe') }}">{{ _('Registe Manage') }}</a></li>
-                    <li><a href="{{ url_for('main.index_app') }}">{{ _('Web App Manage') }}</a></li>
+                    <li><a href="{{ url_for('main.index_app') }}">{{ _('App Manage') }}</a></li>
                     <li><a href="{{ url_for('main.index_tenant') }}">{{ _('Tenant Service') }}</a></li>
                     <li><a href="{{ url_for('main.explore') }}">{{ _('Explore') }}</a></li>
                 </ul>
@@ -65,7 +65,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="col"s>
+    <div class="col">
         <div class="app-container flat-blue">
             <div class="col content-container">
                 <div class="side-menu sidebar-inverse">
@@ -97,6 +97,11 @@
                                 <li class="active">{% block subtitle2 %}{% endblock %}</li>
                             </ol>
                         </div>
+                        <div class="navbar-right">
+                            <ol class="breadcrumb navbar-breadcrumb" style="margin-right: 30px;">
+                                <li class="active">{% block subtitle3 %}{% endblock %}</li>
+                            </ol>
+                        </div>
                     </div>
                 </nav>
                 <!-- Main Content -->
@@ -123,8 +128,6 @@
                         {% endfor %}
                     {% endif %}
                     {% endwith %}
-
-                    {# application content needs to be provided in the app_content block #}
                     {% block app_content %}{% endblock %}
                 </div>
             </div>
@@ -150,5 +153,5 @@
     <script type="text/javascript" src="../static/lib/js/ace/theme-github.js"></script>
     <!-- Javascript -->
     <script type="text/javascript" src="../static/js/app.js"></script>
-    <script type="text/javascript" src="../static/js/index.js"></script>
+{#    <script type="text/javascript" src="../static/js/index.js"></script>#}
 {% endblock %}

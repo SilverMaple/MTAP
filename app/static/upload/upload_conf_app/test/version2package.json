@@ -1,0 +1,276 @@
+[
+	{
+		"data": {},
+		"icon": true,
+		"id": "Root",
+		"parent": "#",
+		"text": "Root",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "wanzhengban",
+		"parent": "Root",
+		"text": "完整版",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./WebRoot/bs/jsp/common/left.jsp",
+			"item_pattern": "/\\(\u003cdt\u003e.*\u003c\\/i\u003e工作处理\u003ci.*\u003c\\/i\u003e\u003c\\/dt\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "1-gongzuochuli",
+		"parent": "wanzhengban",
+		"text": "1-工作处理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-tongzhichuli",
+		"parent": "1-gongzuochuli",
+		"text": "1-通知处理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-kechengdayi",
+		"parent": "1-gongzuochuli",
+		"text": "1-课程答疑",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-daibangongzuochuli",
+		"parent": "1-gongzuochuli",
+		"text": "1-待办工作处理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-shenhejiluguanli",
+		"parent": "1-gongzuochuli",
+		"text": "1-审核记录管理",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./WebRoot/bs/jsp/common/left.jsp",
+			"item_pattern": "/\\(\u003cdt\u003e.*\u003c\\/i\u003e课程管理\u003ci.*\u003c\\/i\u003e\u003c\\/dt\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "1-kechengguanli",
+		"parent": "wanzhengban",
+		"text": "1-课程管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-jiaoshishoukeguanli",
+		"parent": "1-kechengguanli",
+		"text": "1-教师授课管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-kechengleibieguanli",
+		"parent": "1-kechengguanli",
+		"text": "1-课程类别管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-kechengxinxiguanli",
+		"parent": "1-kechengguanli",
+		"text": "1-课程信息管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-zhangjieguanli",
+		"parent": "1-kechengguanli",
+		"text": "1-章节管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-shipinguanli",
+		"parent": "1-kechengguanli",
+		"text": "1-视频管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-kechengziliaoguanli",
+		"parent": "1-kechengguanli",
+		"text": "1-课程资料管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-shitiguanli",
+		"parent": "1-kechengguanli",
+		"text": "1-试题管理",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./WebRoot/bs/jsp/common/left.jsp",
+			"item_pattern": "/\\(\u003cdt\u003e.*\u003c\\/i\u003e系统管理\u003ci.*\u003c\\/i\u003e\u003c\\/dt\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "1-xitongguanli",
+		"parent": "wanzhengban",
+		"text": "1-系统管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-gongnengdingyi",
+		"parent": "1-xitongguanli",
+		"text": "1-功能定义",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-hengfushezhi",
+		"parent": "1-xitongguanli",
+		"text": "1-横幅设置",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-xunibiguanli",
+		"parent": "1-xitongguanli",
+		"text": "1-虚拟币管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-vipleibieguanli",
+		"parent": "1-xitongguanli",
+		"text": "1-vip类别管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-chongzhimianzhiguanli",
+		"parent": "1-xitongguanli",
+		"text": "1-充值面值管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-qiyeyouxiangguanli",
+		"parent": "1-xitongguanli",
+		"text": "1-企业邮箱管理",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./WebRoot/bs/jsp/common/left.jsp",
+			"item_pattern": "/\\(\u003cdt\u003e.*\u003c\\/i\u003e用户管理\u003ci.*\u003c\\/i\u003e\u003c\\/dt\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "1-yonghuguanli",
+		"parent": "wanzhengban",
+		"text": "1-用户管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-jiaoseguanli",
+		"parent": "1-yonghuguanli",
+		"text": "1-角色管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-houtaiyonghuguanli",
+		"parent": "1-yonghuguanli",
+		"text": "1-后台用户管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-qiantaiyonghuguanli",
+		"parent": "1-yonghuguanli",
+		"text": "1-前台用户管理",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./WebRoot/bs/jsp/common/left.jsp",
+			"item_pattern": "/\\(\u003cdt\u003e.*\u003c\\/i\u003e统计分析\u003ci.*\u003c\\/i\u003e\u003c\\/dt\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "1-tongjifenxi",
+		"parent": "wanzhengban",
+		"text": "1-统计分析",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-kechengtongji",
+		"parent": "1-tongjifenxi",
+		"text": "1-课程统计",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-viptongji",
+		"parent": "1-tongjifenxi",
+		"text": "1-vip统计",
+		"type": "default"
+	},
+	{
+		"data": {
+			"file_path": "./WebRoot/bs/jsp/common/left.jsp",
+			"item_pattern": "/\\(\u003cdt\u003e.*\u003c\\/i\u003e账户管理\u003ci.*\u003c\\/i\u003e\u003c\\/dt\u003e\\)/p"
+		},
+		"icon": true,
+		"id": "1-zhanghuguanli",
+		"parent": "wanzhengban",
+		"text": "1-账户管理",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-ziliaoshezhi",
+		"parent": "1-zhanghuguanli",
+		"text": "1-资料设置",
+		"type": "default"
+	},
+	{
+		"data": {},
+		"icon": true,
+		"id": "1-xiugaimima",
+		"parent": "1-zhanghuguanli",
+		"text": "1-修改密码",
+		"type": "default"
+	}
+]

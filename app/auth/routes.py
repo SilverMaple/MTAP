@@ -4,7 +4,7 @@
 # @Site    : https://github.com/SilverMaple
 # @File    : routes.py
 
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, session
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_babel import _
@@ -31,6 +31,8 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
+        # set a debug manage id for test
+        session['current_app_manager_id'] = '7'
         if user is None or not user.check_password(form.password.data):
             flash(_('Invalid username or password'))
             return redirect(url_for('auth.login'))

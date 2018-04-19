@@ -1,5 +1,8 @@
-{% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends "tenant_service_base.html" %}
+
+{% block subtitle2 %}
+    {{ _('Tenant Service') }}
+{% endblock %}
 
 {% block app_content %}
     <p>Tenant Service</p>

@@ -22,7 +22,7 @@
     </li>
     <li id="index_app">
         <a href={{ url_for('main.index_app') }}>
-            <span class="icon fa fa-th-large fa-fw"></span><span class="title">{{ _('Web App Manage') }}</span>
+            <span class="icon fa fa-th-large fa-fw"></span><span class="title">{{ _('App Manage') }}</span>
         </a>
     </li>
     <li id="index_tenant">
@@ -60,4 +60,24 @@
             </li>
         </ul>
     </nav>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript">
+        function changeActive(){
+            if(window.location.href.indexOf("index_registe") != -1) {
+                $("#index_registe").addClass("active");
+            }else if(window.location.href.indexOf("index_app") != -1) {
+                $("#index_app").addClass("active");
+            }else if(window.location.href.indexOf("index_tenant") != -1) {
+                $("#index_tenant").addClass("active");
+            }else if(window.location.href.indexOf("explore") != -1) {
+                $("#explore").addClass("active");
+            }else {
+                $("#dashboard").addClass("active");
+            }
+        }
+    window.onload=changeActive();
+    </script>
 {% endblock %}
