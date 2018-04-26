@@ -5,8 +5,8 @@
 # @File    : routes.py
 
 import hashlib
-import json
 import os
+import json
 from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request, g, \
     jsonify, current_app, session
@@ -757,6 +757,97 @@ def app_manage_function_configure():
                            isDelete=isDelete, tHead=tHead, data=data)
 
 
+@bp.route('/get_file_path/<tag>', methods=['GET', 'POST'])
+@login_required
+def get_file_path(tag):
+    app_id = App.query.filter(App.id == session['current_selected_app_id']).first().appid
+    if tag == 'version2package.json' or tag == 'package2function.json':
+        filePath = os.path.join(os.path.join(
+            current_app.config['UPLOAD_FOLDERS']['app_manage_function_configure'], app_id), tag)
+        if os.path.isfile(filePath):
+            filePath = os.path.join(os.path.join(
+                current_app.config['UPLOAD_FOLDERS']['app_manage_function_configure_html'], app_id), tag)
+            return jsonify({'result': 'success', 'filePath': filePath})
+    return jsonify({'result': 'fail', 'filePath': False})
+
+
+@bp.route('/app_manage_init_file/<tag>', methods=['GET', 'POST'])
+@login_required
+def app_manage_init_file(tag):
+    app_id = App.query.filter(App.id == session['current_selected_app_id']).first().appid
+    filePath = os.path.join(
+        current_app.config['UPLOAD_FOLDERS']['app_manage_function_configure'], app_id)
+    if not os.path.isdir(filePath):
+        os.makedirs(filePath)
+
+    initJson = [
+        {
+            "data": {
+                "file_path": "",
+                "item_pattern": ""
+            },
+            "id": "Root",
+            "parent": "#",
+            "text": "Root"
+        }
+    ]
+    if tag in ['version2package.json', 'package2function.json']:
+        try:
+            new_file = open(os.path.join(filePath, tag), 'w')
+            new_file.write(json.dumps(initJson))
+            new_file.close()
+            flash(_('File initial for %(tag)s success.', tag=tag))
+        except Exception as e:
+            print(e)
+            flash(_('File initial for %(tag)s failed.', tag=tag))
+    return jsonify({'result': 'success'})
+
+
+@bp.route('/app_manage_save_file', methods=['GET', 'POST'])
+@login_required
+def app_manage_save_file():
+    data = request.get_json()
+    app_id = App.query.filter(App.id == session['current_selected_app_id']).first().appid
+    filePath = os.path.join(
+        current_app.config['UPLOAD_FOLDERS']['app_manage_function_configure'], app_id)
+
+    if not os.path.isdir(filePath):
+        os.makedirs(filePath)
+
+    tag = data['tag']
+    new_json = json.loads(data['json'])
+    print(new_json)
+    if tag in ['version2package.json', 'package2function.json']:
+        try:
+            new_file = open(os.path.join(filePath, tag), 'w')
+            # new_file.write(json.dumps(new_json))
+            # json.dump(new_json, new_file, ensure_ascii=False, indent=4)
+            json.dump(new_json, new_file, indent=4)
+            new_file.close()
+            flash(_('File save for %(tag)s success.', tag=tag))
+        except Exception as e:
+            print(e)
+            flash(_('File save for %(tag)s failed.', tag=tag))
+    return jsonify({'result': 'success'})
+
+
+@bp.route('/app_manage_upload_file', methods=['GET', 'POST'])
+@login_required
+def app_manage_upload_file():
+    version_to_package_file = request.files['version_to_package_file']
+    package_to_function_file = request.files['package_to_function_file']
+    app_id = App.query.filter(App.id == session['current_selected_app_id']).first().appid
+    filePath = os.path.join(
+        current_app.config['UPLOAD_FOLDERS']['app_manage_function_configure'], app_id)
+
+    if not os.path.isdir(filePath):
+        os.makedirs(filePath)
+    version_to_package_file.save(os.path.join(filePath, 'version2package.json'))
+    package_to_function_file.save(os.path.join(filePath, 'package2function.json'))
+    flash(_('Import success!'))
+    return jsonify({'result': 'success'})
+
+
 # ---------------------------------------------------------------------------------------
 # app manage database configure
 # ---------------------------------------------------------------------------------------
@@ -953,7 +1044,8 @@ def app_manage_mirror_list():
     tHead = [_('Mirror Name'), _('Creator'), _('Created Time')]
     data = [App.query.order_by(db.asc(App.name)).first()]
     return render_template('app_manage_mirror_list.html', title=_('Mirror Manage'),
-                           tableName=_('Mirror List'), AppAdmin=AppAdmin,
+                           tableName=_('Mirror List'), AppAdmin=AppAdmin, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
                            isCheck=isCheck, isEdit=isEdit,
                            isDelete=isDelete, tHead=tHead, data=data)
 
@@ -1080,7 +1172,8 @@ def app_manage_service_deploy():
     action_list = [_('Publish'), _('Adjust'), _('Restart'), _('Stop'), _('Destroy')]
     data = [App.query.order_by(db.asc(App.name)).first()]
     return render_template('app_manage_service_deploy.html', title=_('Service Deploy'),
-                           tableName=_('Service List'), action_list=action_list,
+                           tableName=_('Service List'), action_list=action_list, app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
                            isCheck=isCheck, isEdit=isEdit,
                            isDelete=isDelete, tHead=tHead, data=data)
 

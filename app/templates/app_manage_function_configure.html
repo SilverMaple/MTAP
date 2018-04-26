@@ -52,15 +52,16 @@
                 <th>
                     <span class="icon fa fa-bars" style="padding: 10px"></span>
                     <span class="title h3">{{ tableName }}</span>
-                    <a href={{ url_for('main.app_manage_function_configure') }}>
+                    <a href={{ url_for('main.app_manage_function_configure') }} title='{{ _('refresh') }}'>
                         <span style="float: right; padding: 10px; padding-right: 27px;"
                               class="icon fa fa-refresh fa-fw"></span>
                     </a>
-                    <a href={{ url_for('main.app_manage_function_configure') }}>
+{#                    <a href={{ url_for('main.app_manage_function_configure') }}>#}
+                    <a onclick="upload()" href="#" title="{{ _('upload') }}">
                         <span style="float: right; padding: 10px; padding-right: 27px"
                               class="icon fa fa-cloud-upload fa-fw"></span>
                     </a>
-                    <button style="float: right;" class="btn btn-info btn-xs" onclick="submitForm()">
+                    <button style="float: right;" class="btn btn-info btn-xs" onclick="save()" title="{{ _('save') }}">
                         <span class="icon fa fa-save fa-fw"></span>
                     </button>
                 </th>
@@ -71,6 +72,9 @@
                 <th>
                     <div class="container-fluid">
                         <div class="panel panel-default">
+                            <div style="color: #1b8df2">
+                                树形结构的id取自于节点文本的拼音，请保证节点文本的唯一性。出现包含冲突时，推荐使用“x-yyy”的形式进行命名，我们在标记界面元素和逻辑功能/功能包时，将会帮您去除“x-”部分，取剩下的“yyy”作为识别依据。“软件版本->功能包”最后一层功能包对应于“功能包->原子功能”的功能包。
+                            </div>
                             <div class="panel-heading">
                                 <h3 class="panel-title"><i class="fa fa-cubes"></i>
                                     {{ _('Software Version') }}
@@ -80,25 +84,11 @@
                             </div>
                             <div class="panel-body">
                                 <div class="row">
-                                    <div id="jstree_demo_1" class="demo jstree jstree-1 jstree-default" role="tree"
-                                         aria-multiselectable="true" tabindex="0" aria-activedescendant="Root"
-                                         aria-busy="false">
-                                        <ul class="jstree-container-ul jstree-children jstree-striped jstree-contextmenu jstree-wholerow-ul jstree-no-dots"
-                                            role="group">
-                                            <li role="treeitem" aria-selected="false" aria-level="1"
-                                                aria-labelledby="Root_anchor" aria-expanded="false" id="Root"
-                                                class="jstree-node  jstree-closed jstree-last">
-                                                <div unselectable="on" role="presentation" class="jstree-wholerow">
-                                                    &nbsp;</div>
-                                                <i class="jstree-icon jstree-ocl" role="presentation"></i><a
-                                                    class="jstree-anchor" href="#" tabindex="-1" id="Root_anchor"><i
-                                                    class="jstree-icon jstree-themeicon"
-                                                    role="presentation"></i>Root</a></li>
-                                        </ul>
+                                    <div id="jstree_demo_1" class="demo">
                                     </div>
                                     <div id="jstree_demo_1_init_btn" style="display: none;padding-left: 20px">
                                         <button type="button" class="btn btn-success"
-                                                onclick="init(&quot;version2package&quot;)">{{ _('Initial') }}
+                                                onclick="init('version2package.json')">{{ _('Initial') }}
                                         </button>
                                     </div>
                                 </div>
@@ -111,34 +101,23 @@
                 <th>
                     <div class="container-fluid">
                         <div class="panel panel-default">
+                            <div style="color: #1b8df2">
+                                树形结构的id取自于节点文本的拼音，请保证节点文本的唯一性。“功能包->原子功能”的设计原则是：原子功能只属于一个功能包，功能包也只有一层，为上层功能包/版本所复用。
+                            </div>
                             <div class="panel-heading">
                                 <h3 class="panel-title"><i class="fa fa-cubes"></i>
                                     {{ _('Function Package') }}
                                     <i class="fa fa-caret-right"></i>
-                                    {{ _('Software Version') }}
+                                    {{ _('Atomic Function') }}
                                 </h3>
                             </div>
                             <div class="panel-body">
                                 <div class="row">
-                                    <div id="jstree_demo_2" class="demo jstree jstree-2 jstree-default" role="tree"
-                                         aria-multiselectable="true" tabindex="0" aria-activedescendant="root"
-                                         aria-busy="false">
-                                        <ul class="jstree-container-ul jstree-children jstree-striped jstree-contextmenu jstree-wholerow-ul jstree-no-dots"
-                                            role="group">
-                                            <li role="treeitem" aria-selected="false" aria-level="1"
-                                                aria-labelledby="root_anchor" aria-expanded="false" id="root"
-                                                class="jstree-node  jstree-closed jstree-last">
-                                                <div unselectable="on" role="presentation" class="jstree-wholerow">
-                                                    &nbsp;</div>
-                                                <i class="jstree-icon jstree-ocl" role="presentation"></i><a
-                                                    class="jstree-anchor" href="#" tabindex="-1" id="root_anchor"><i
-                                                    class="jstree-icon jstree-themeicon"
-                                                    role="presentation"></i>Root</a></li>
-                                        </ul>
+                                    <div id="jstree_demo_2" class="demo">
                                     </div>
                                     <div id="jstree_demo_2_init_btn" style="display: none;padding-left: 20px">
                                         <button type="button" class="btn btn-success"
-                                                onclick="init(&quot;package2function&quot;)">初始化
+                                                onclick="init('package2function.json')">{{ _('Initial') }}
                                         </button>
                                     </div>
                                 </div>
@@ -149,6 +128,248 @@
             </tr>
             </tbody>
         </table>
+        <!-- 功能配置-->
+        <!-- Modal -->
+        <div>
+          <div class="modal fade" id="settingModal0" tabindex="-1" role="dialog" >
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" >设置</h4>
+                </div>
+                <div class="modal-body" style="padding-top:0px">
+                  <form method="post" class="form-horizontal">
+                    <div class="table-responsive">
+                      <div class="form-group col-sm-12">
+                        <label class="col-sm-3 control-label" style="margin-top:6px">文件路径</label>
+                        <div class="col-sm-9">
+                          <input type="text" required="required" id="file_path" class="form-control"/>
+                          <div style="color:red">说明：相对于项目根路径的相对路径，不包含项目名
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group col-sm-12">
+                        <label class="col-sm-3 control-label" style="margin-top:6px">元素定位</label>
+                        <div class="col-sm-9">
+                          <textarea rows="2" required="required" id="item_pattern" class="form-control"></textarea>
+                          <div style="color:red">说明：该模式需要能唯一识别到元素，将应用于"sed -n 'xxx'"，特殊字符'('、')'、'&amp;'、'/'自行转义
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group col-sm-12">
+                        <label class="col-sm-3 control-label" style="margin-top:6px">sed区间匹配</label>
+                        <div class="col-sm-9">
+                          <button onclick="$('#sedModal0').modal('show');" class="btn btn-default" type="button">点我展开说明</button>
+                        </div>
+                      </div>
+                    <!--   <div class="form-group col-sm-12">
+                        <div id="funcEntry-div">
+                          <div class="form-group">
+                            <label class="col-sm-3 control-label">服务函数声明</label>
+                            <div class="col-sm-9">
+                              <a class="btn btn-primary" v-on:click="addNew"><i class="fa fa-plus"></i></a>
+                            </div>
+                          </div>
+                          <div is="funcEntry-item"
+                            v-for="(p, index) in funcEntrys"
+                            v-bind:id="p.id"
+                            v-bind:file="p.file"
+                            v-bind:func="p.func"
+                            @remove="removeFuncEntrys(index)"
+                            @update="updateFuncEntrys">
+                          </div>
+                        </div>
+                    </div> -->
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" id="setting_save">确定</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
+
+        <!-- 一键导入配置文件 -->
+        <!-- Modal -->
+        <div>
+          <div class="modal fade" id="funcModal0" tabindex="-1" role="dialog" >
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" >导入配置文件</h4>
+                </div>
+                <div class="modal-body" style="padding-top:0px">
+                  <form id="upload_form" method="post" class="form-horizontal" enctype="multipart/form-data" method="post" action="{{ url_for('main.app_manage_app_list') }}">
+                    <div class="table-responsive">
+                      <div class="form-group col-sm-12">
+                        <label class="col-sm-4 control-label" style="margin-top:0px">版本->功能包|Json</label>
+                        <div class="col-sm-8">
+                          <input type="file" name="version_to_package_file" class="form-control"/>
+                        </div>
+                      </div>
+                      <div class="form-group col-sm-12">
+                        <label class="col-sm-4 control-label" style="margin-top:0px">功能包->原子功能|Json</label>
+                        <div class="col-sm-8">
+                          <input type="file" name="package_to_function_file" class="form-control"/>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                  <button type="button" class="btn btn-primary" onclick="startUploading()">上传</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
+
+        <!-- 测试模式匹配 -->
+        <!-- Modal -->
+        <div>
+          <div class="modal fade" id="testModal0" tabindex="-1" role="dialog" >
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" >测试模式匹配</h4>
+                </div>
+                <div class="modal-body" style="padding-top:0px">
+                  <form id="test_upload_form" method="post" class="form-horizontal" enctype="multipart/form-data" method="post" action="{{ url_for('main.app_manage_app_list') }}">
+                    <div class="table-responsive">
+                      <div class="form-group col-sm-12">
+                        <label class="col-sm-3 control-label" style="margin-top:0px">注意</label>
+                        <div class="col-sm-9">
+                          <label class="control-label">请先在代码信息配置中配置应用类型和插入标签模板</label>
+                        </div>
+                      </div>
+                      <div class="form-group col-sm-12">
+                        <label class="col-sm-3 control-label" style="margin-top:0px">模拟文件路径</label>
+                        <div class="col-sm-9">
+                          <input type="text" name="simulation_path" class="form-control"/>
+                        </div>
+                      </div>
+                      <div class="form-group col-sm-12">
+                        <label class="col-sm-3 control-label" style="margin-top:0px">模拟文件</label>
+                        <div class="col-sm-9">
+                          <input type="file" name="simulation_file" class="form-control"/>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                  <button type="button" class="btn btn-primary" onclick="startTesting()">测试</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
+
+        <!-- 测试模式匹配结果 -->
+        <!-- Modal -->
+        <div>
+          <div class="modal fade" id="testResultModal0" tabindex="-1" role="dialog" >
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" >测试模式匹配结果</h4>
+                </div>
+                <div class="modal-body">
+                  <form id="test_upload_form" method="post" class="form-horizontal" enctype="multipart/form-data" method="post" action="{{ url_for('main.app_manage_app_list') }}">
+                    <div class="table-responsive">
+                      <textarea rows="25" class="form-control" id="result-textarea"></textarea>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
+
+        <!-- sed区间匹配说明 -->
+        <!-- Modal -->
+        <div>
+          <div class="modal fade bs-example-modal-lg" id="sedModal0" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" >sed区间匹配说明</h4>
+                </div>
+                <div class="modal-body">
+                  <form class="form-horizontal">
+                    <div class="table-responsive">
+                      <table class="table table-striped">
+                        <thead>
+                        </thead>
+                        <tbody>
+                          <tr class="active"><td>参考</td></tr>
+                          <tr><td>http://blog.jobbole.com/109088/</td></tr>
+                          <tr><td>示例</td></tr>
+                          <tr><td><pre>&lt;dd&gt;
+        ...
+    &lt;/dd&gt;
+    &lt;dd&gt;
+        &lt;a data-title="API监控"&gt;&lt;span&gt;API监控&lt;/span&gt;&lt;/a&gt;
+    &lt;/dd&gt;
+    &lt;dd&gt;
+        ...
+    &lt;/dd&gt;</pre></td></tr>
+                          <tr><td>命令</td></tr>
+                          <tr><td><pre>cat -n /tmp/main.html | sed -n "x;/&lt;dd&gt;.*API监控.*&lt;\/dd&gt;/{p;q};/&lt;dd&gt;.*&lt;\/dd&gt;/{x;h;d;ta};/&lt;dd&gt;.*/{x;H;ta};{x;h;d};:a"
+                          | { eval $(awk 'NR==1{print "a="$1} END {print "b="$1}');
+                          sed -e "$a i begin" -e "$b a end" /tmp/main.html;}</pre></td></tr>
+                          <tr><td>算法</td></tr>
+                          <tr><td><pre>默认情况下，SED将会输出模式空间中的内容，另外，我们的命令中包含了输出命令p，因此每一行被打印两次。
+    -n参数用于禁止自动输出模式空间的每一行的行为
+
+    区间匹配并外嵌内容
+    首先读取一行到模式空间，将当前模式空间行与保持空间互换
+    互换之后，判断模式空间内容是否匹配&lt;dd&gt;.*API监控.*&lt;/dd&gt;
+    如果匹配，打印内容，退出
+    如果不匹配，判断模式空间内容是否匹配&lt;dd&gt;.*&lt;/dd&gt;
+        如果匹配，丢弃该区间内容：将当前模式空间行与保持空间互换，将当前模式空间行复制到保持空间(会先清空保持空间)，
+        然后删除当前模式空间行，跳到a标签读取下一行（若匹配范围只有一行且没有删除当前模式空间行，则会输出两次，原因暂时不明）
+        如果不匹配，判断模式空间内容是否匹配&lt;dd&gt;.*
+            如果匹配，将当前模式空间行与保持空间互换，将当前模式空间行追加到保持空间，跳到a标签读取下一行
+            如果不匹配，丢弃：将当前模式空间行与保持空间互换，将当前模式空间行复制到保持空间(会先清空保持空间)，
+            然后删除当前模式空间行</pre></td></tr>
+                          <tr><td>注意</td></tr>
+                          <tr><td>获取匹配内容及其所在行数之后，在行首和行末插入我们需要的内容。
+    注意，当匹配内容为空时，
+    可能会演变成在每一行的行首和行末都插入内容的情况，因此需要对模式进行测试。</td></tr>
+                          <tr><td>单行匹配并外嵌内容</td></tr>
+                          <tr><td><pre>cat -n main.html | sed -n "/\(&lt;a.*API管理.*&lt;\/a&gt;\)/p"
+                          | { eval $(awk 'NR==1{print "a="$1} END {print "b="$1}');
+                          sed -e "$a i begin" -e "$b a end" main.html;}</pre></td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
     {% endif %}
 {% endblock %}
 
@@ -209,28 +430,43 @@
         }
     </script>
     <script>
-        var versionToPackageFileName = "../static/upload/upload_conf_app/test//version2package.json";
-        var packageToFunctionFileName = "../static/upload/upload_conf_app/test//package2function.json";
-{#        var versionToPackageFileName = "../static/upload-conf-app/43a3097cf9bbefaa92cb31673257db0c//version2package.json";#}
-{#        var packageToFunctionFileName = "../static/upload-conf-app/43a3097cf9bbefaa92cb31673257db0c//package2function.json";#}
+{#        var versionToPackageFileName = "../static/upload/upload_conf_app/test//version2package.json";#}
+{#        var packageToFunctionFileName = "../static/upload/upload_conf_app/test//package2function.json";#}
+        var versionToPackageFileName = null;
+        var packageToFunctionFileName = null;
         var jstree_demo_1_inited = false;
         var jstree_demo_2_inited = false;
+{#        $.ajaxSetup({async : false});#}
+        $.post('{{ url_for('main.get_file_path', tag='version2package.json') }}', function (data) {
+            if (data.result == 'success') {
+                versionToPackageFileName = data.filePath;
+            }else {
+                versionToPackageFileName = false;
+            }
 
-        if (versionToPackageFileName) {
-            buildTree('jstree_demo_1', 'jstree_demo_2', versionToPackageFileName + "?number=" + Math.random());
-            jstree_demo_1_inited = true;
-            console.log('build version ok')
-        } else {
-            document.getElementById("jstree_demo_1_init_btn").style.display = "block";
-        }
+            if (versionToPackageFileName != false) {
+                buildTree('jstree_demo_1', 'jstree_demo_2', versionToPackageFileName + "?number=" + Math.random());
+                jstree_demo_1_inited = true;
+{#                console.log('build version ok')#}
+            } else {
+                document.getElementById("jstree_demo_1_init_btn").style.display = "block";
+            }
+        });
 
-        if (packageToFunctionFileName) {
-            buildTree('jstree_demo_2', 'jstree_demo_1', packageToFunctionFileName + "?number=" + Math.random());
-            jstree_demo_2_inited = true;
-            console.log('build package ok')
-        } else {
-            document.getElementById("jstree_demo_2_init_btn").style.display = "block";
-        }
+        $.post('{{ url_for('main.get_file_path', tag='package2function.json') }}', function (data) {
+            if (data.result == 'success') {
+                packageToFunctionFileName = data.filePath;
+            }else {
+                packageToFunctionFileName = false;
+            }
+            if (packageToFunctionFileName != false) {
+                buildTree('jstree_demo_2', 'jstree_demo_1', packageToFunctionFileName + "?number=" + Math.random());
+                jstree_demo_2_inited = true;
+{#                console.log('build package ok')#}
+            } else {
+                document.getElementById("jstree_demo_2_init_btn").style.display = "block";
+            }
+        });
 
         function buildTree(id, anotherId, url) {
 
@@ -247,8 +483,9 @@
                     $('#file_path').val(node.data.file_path);
                     $('#item_pattern').val(node.data.item_pattern);
                     $('#settingModal0').modal('show');
-                    $('#setting_save').unbind("click");
-                    $('#setting_save').bind("click", node.id, function (e) {
+                    var saveButton = $('#setting_save');
+                    saveButton.unbind("click");
+                    saveButton.bind("click", node.id, function (e) {
                         var id = e.data;
                         var obj = $('#' + id).jstree(true).get_node({id: id});
                         obj.data = new Object();
@@ -258,7 +495,7 @@
                     });
                 }
             };
-            console.log('setting ok');
+{#            console.log('setting ok');#}
             $('#' + id).jstree({
                 "core": {
                     "animation": 0,
@@ -268,9 +505,9 @@
                         'url': function (node) {
                             return url;
                         },
-{#                        'data': function (node) {#}
-{#                            return {'id': node.id};#}
-{#                        }#}
+                        'data': function (node) {
+                            return {'id': node.id};
+                        },
 {#                        "url" : url,#}
                         "dataType" : "json"
                     }
@@ -307,35 +544,39 @@
             });
         }
 
-{##}
-{#        function init(tag) {#}
-{#            var url = "/app/tools/onlineconf/init";#}
-{#            $.post(url, {"tag": tag}, function (data) {#}
-{#                if (data.code == 0) {#}
-{#                    window.location.href = "/app/tools/onlineconf/index"#}
-{#                } else {#}
-{#                    alert(data.message)#}
-{#                }#}
-{#            });#}
-{#        }#}
+
+        function init(tag) {
+            var current_url = window.location.href;
+            var url = null;
+            if(tag == 'package2function.json') {
+                url = '{{ url_for('main.app_manage_init_file', tag='package2function.json') }}';
+            }else if(tag == 'version2package.json') {
+                url = '{{ url_for('main.app_manage_init_file', tag='version2package.json') }}';
+            }
+            $.post(url, function (data) {
+                window.location.href = current_url;
+            });
+        }
 
 
         function save() {
+            var current_url = window.location.href;
             var callback = function () {
                 if (jstree_demo_2_inited) {
-                    save2('jstree_demo_2', "package2function", "/app/tools/onlineconf/save" + "?number=" + Math.random(),
+                    save2('jstree_demo_2', "package2function.json",
                             function () {
-                                window.location.href = "/app/tools/onlineconf/index";
+{#                                window.location.href = current_url;#}
+                                window.location.reload()
                             });
                 }
-            }
+            };
             if (jstree_demo_1_inited) {
-                save2('jstree_demo_1', "version2package", "/app/tools/onlineconf/save" + "?number=" + Math.random(), callback);
+                save2('jstree_demo_1', "version2package.json", callback);
             }
         }
 
 
-        function save2(id, tag, url, callback) {
+        function save2(id, tag, callback) {
             var v = $('#' + id).jstree(true).get_json("#", {
                 "flat": true,
                 "no_a_attr": true,
@@ -350,13 +591,20 @@
                 }
             }
             var json = JSON.stringify(v);
-            $.post(url, {"tag": tag, "json": json}, function (data) {
-                if (data.code == 0) {
+            url = '{{ url_for('main.app_manage_save_file') }}';
+            $.ajax({
+                type: 'POST',
+                url: url,
+{#                data: {"tag": tag, "json": json},#}
+                data: JSON.stringify({"tag": tag, "json": json}),
+                contentType: 'application/json; charset=UTF-8',
+                dataType: 'json',
+                success: function(data) {
                     if (callback) {
                         callback();
                     }
-                } else {
-                    alert(data.message)
+                },
+                error: function(xhr, type) {
                 }
             });
         }
@@ -372,14 +620,16 @@
 
             var oXHR = new XMLHttpRequest();
             oXHR.addEventListener('load', uploadFinish, false);
-            oXHR.open('POST', "/app/tools/onlineconf/upload");
+            oXHR.open('POST', '{{ url_for('main.app_manage_upload_file') }}');
             oXHR.send(vFD);
         }
 
         function uploadFinish(e) {
-            alert(e.target.responseText);
+{#            alert(e.target.responseText);#}
+{#            var current_url = window.location.href;#}
             $('#funcModal0').modal('hide');
-            window.location.href = "/app/tools/onlineconf/index";
+{#            window.location.href = current_url;#}
+            window.location.reload()
         }
 
 

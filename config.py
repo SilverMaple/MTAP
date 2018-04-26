@@ -24,7 +24,7 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['1093387079@qq.com', 'fhd573906@gmail.com']
-    LANGUAGES = ['en', 'es', 'en-US', 'en-GB', 'en-CA']
+    LANGUAGES = ['zh_CN', 'en', 'es', 'en-US', 'en-GB', 'en-CA']
     POSTS_PER_PAGE = 25
 
     ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
@@ -34,4 +34,7 @@ class Config(object):
     # RECAPTCHA_PRIVATE_KEY = 'private'
     # RECAPTCHA_OPTIONS = {'theme': 'white'}
 
-    UPLOAD_FOLDERS = {'registe_manage_app_extension': 'app\\static\\upload\\upload_app_extension'}
+    UPLOAD_FOLDERS = {'registe_manage_app_extension': 'app\\static\\upload\\upload_app_extension',
+                      'app_manage_function_configure': 'app\\static\\upload\\upload_conf_app',
+                      'app_manage_function_configure_html': '..\\static\\upload\\upload_conf_app',
+                      }

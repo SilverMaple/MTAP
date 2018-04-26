@@ -106,14 +106,20 @@
                 $("#app_list").addClass("active");
             }else if(window.location.href.indexOf("app_manage_function_configure") != -1) {
                 $("#function_configure").addClass("active");
+                $("#app_configure_dropdown").addClass("in");
             }else if(window.location.href.indexOf("app_manage_database_configure") != -1) {
                 $("#database_configure").addClass("active");
+                $("#app_configure_dropdown").addClass("in");
             }else if(window.location.href.indexOf("app_manage_code_configure") != -1) {
-                $("#code_configure").addClass("active");}
-            else if(window.location.href.indexOf("app_manage_mirror_list") != -1) {
-                $("#mirror_list").addClass("active");}
+                $("#code_configure").addClass("active");
+                $("#app_configure_dropdown").addClass("in");
+            }else if(window.location.href.indexOf("app_manage_mirror_list") != -1) {
+                $("#mirror_list").addClass("active");
+                $("#app_deploy_dropdown").addClass("in");
+            }
             else if(window.location.href.indexOf("app_manage_service_deploy") != -1) {
                 $("#service_deploy").addClass("active");
+                $("#app_deploy_dropdown").addClass("in");
             }else {
                 $("#dashboard").addClass("active");
             }

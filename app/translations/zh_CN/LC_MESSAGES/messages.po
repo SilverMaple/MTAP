@@ -8,119 +8,118 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-04-25 15:45+0800\n"
-"PO-Revision-Date: 2018-04-25 16:59+0800\n"
-"Language: zh_CN\n"
+"PO-Revision-Date: 2018-04-25 15:45+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_Hans_CN\n"
 "Language-Team: zh_Hans_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.5.3\n"
-"Last-Translator: \n"
-"X-Generator: Poedit 2.0.7\n"
 
 #: app/__init__.py:26
 msgid "Please log in to access this page."
-msgstr "请登录以访问该页面."
+msgstr ""
 
 #: app/email.py:40
 #, python-format
 msgid "[MoodBit] %s is now following you!"
-msgstr "%s 正在关注你!"
+msgstr ""
 
 #: app/translate.py:16
 msgid "Error: the translation service is not configured."
-msgstr "错误: 未配置翻译服务。"
+msgstr ""
 
 #: app/translate.py:24
 msgid "Error: the translation service failed."
-msgstr "错误: 翻译服务失败。"
+msgstr ""
 
 #: app/auth/email.py:30
 msgid "[MoodBit] Reset Your Password"
-msgstr "【MoodBit】 重置密码"
+msgstr ""
 
 #: app/auth/email.py:39
 msgid "[MoodBit] %{username}s is now following you!"
-msgstr "【MoodBit】%s 正在关注你！"
+msgstr ""
 
 #: app/auth/forms.py:15 app/auth/forms.py:22 app/main/forms.py:18
 msgid "Username"
-msgstr "用户名"
+msgstr ""
 
 #: app/auth/forms.py:16 app/auth/forms.py:24 app/auth/forms.py:47
 #: app/main/forms.py:216 app/main/forms.py:261
 msgid "Password"
-msgstr "密码"
+msgstr ""
 
 #: app/auth/forms.py:17
 msgid "Remember Me"
-msgstr "记住我"
+msgstr ""
 
 #: app/auth/forms.py:18 app/auth/routes.py:51 app/templates/auth/login.html:5
 msgid "Sign In"
-msgstr "登录"
+msgstr ""
 
 #: app/auth/forms.py:23 app/auth/forms.py:42
 msgid "Email"
-msgstr "电子邮箱"
+msgstr ""
 
 #: app/auth/forms.py:26 app/auth/forms.py:49
 msgid "Repeat Password"
-msgstr "重复密码"
+msgstr ""
 
 #: app/auth/forms.py:28 app/auth/routes.py:79
 #: app/templates/auth/register.html:5
 msgid "Register"
-msgstr "注册"
+msgstr ""
 
 #: app/auth/forms.py:33 app/main/forms.py:31
 msgid "Please use a different username."
-msgstr "请使用其他用户名。"
+msgstr ""
 
 #: app/auth/forms.py:38
 msgid "Please use a different email address."
-msgstr "请使用其他邮箱地址。"
+msgstr ""
 
 #: app/auth/forms.py:43 app/auth/forms.py:51
 msgid "Request Password Reset"
-msgstr "请求重置密碼"
+msgstr ""
 
 #: app/auth/routes.py:37
 msgid "Invalid username or password"
-msgstr "无效的用户名或密码"
+msgstr ""
 
 #: app/auth/routes.py:70
 msgid "Congratulations, you are now a registered user!"
-msgstr "恭喜！你现在已经为注册用户。！"
+msgstr ""
 
 #: app/auth/routes.py:93
 msgid "Check your email for the instructions to reset your password"
-msgstr "请检查您收到的邮件按照指示重置您的密码"
+msgstr ""
 
 #: app/auth/routes.py:96 app/templates/auth/reset_password_request.html:5
 msgid "Reset Password"
-msgstr "重置密码"
+msgstr ""
 
 #: app/auth/routes.py:110
 msgid "Your password has been reset."
-msgstr "您的密码已被重置。"
+msgstr ""
 
 #: app/main/forms.py:19
 msgid "About me"
-msgstr "关于"
+msgstr ""
 
 #: app/main/forms.py:21 app/main/forms.py:36
 msgid "Submit"
-msgstr "提交"
+msgstr ""
 
 #: app/main/forms.py:35
 msgid "Say something"
-msgstr "说点什么"
+msgstr ""
 
 #: app/main/forms.py:40 app/main/routes.py:203
 msgid "Search"
-msgstr "搜索"
+msgstr ""
 
 #: app/main/forms.py:51 app/main/forms.py:201 app/main/forms.py:202
 #: app/main/forms.py:246 app/main/forms.py:247 app/main/routes.py:217
@@ -131,14 +130,14 @@ msgstr "搜索"
 #: app/main/routes.py:1312 app/main/routes.py:1329 app/main/routes.py:1346
 #: app/main/routes.py:1371
 msgid "App Name"
-msgstr "应用名称"
+msgstr ""
 
 #: app/main/forms.py:52 app/main/forms.py:53 app/main/routes.py:217
 #: app/main/routes.py:260 app/main/routes.py:730 app/main/routes.py:751
 #: app/main/routes.py:1206 app/main/routes.py:1250 app/main/routes.py:1267
 #: app/main/routes.py:1292 app/main/routes.py:1346 app/main/routes.py:1371
 msgid "App ID"
-msgstr "应用ID"
+msgstr ""
 
 #: app/main/forms.py:54 app/main/forms.py:55 app/main/routes.py:217
 #: app/main/routes.py:260 app/main/routes.py:730 app/main/routes.py:751
@@ -147,204 +146,204 @@ msgstr "应用ID"
 #: app/main/routes.py:1312 app/main/routes.py:1329 app/main/routes.py:1346
 #: app/main/routes.py:1371
 msgid "Creator"
-msgstr "创建者"
+msgstr ""
 
 #: app/main/forms.py:57 app/main/forms.py:82 app/main/forms.py:107
 #: app/main/forms.py:146 app/main/forms.py:172 app/main/forms.py:217
 #: app/main/forms.py:262 app/main/forms.py:317
 msgid "Save"
-msgstr "保存"
+msgstr ""
 
 #: app/main/forms.py:67
 msgid "Please use a different app name."
-msgstr "请使用其他应用名称。"
+msgstr ""
 
 #: app/main/forms.py:71 app/main/forms.py:96 app/main/forms.py:289
 #: app/main/forms.py:290 app/main/forms.py:292 app/main/routes.py:312
 #: app/main/routes.py:374
 msgid "App Type"
-msgstr "应用类型"
+msgstr ""
 
 #: app/main/forms.py:72 app/main/forms.py:97 app/main/forms.py:294
 msgid "Tag Template(Begin)"
-msgstr "标签模板（开始）"
+msgstr ""
 
 #: app/main/forms.py:73 app/main/forms.py:98 app/main/forms.py:295
 msgid "Tip: role tag begins with $(role_tag)"
-msgstr "提示：角色标签以$(role_tag)开头。"
+msgstr ""
 
 #: app/main/forms.py:74 app/main/forms.py:99 app/main/forms.py:296
 msgid "Tag Template(End)"
-msgstr "标签模板（结束）"
+msgstr ""
 
 #: app/main/forms.py:75 app/main/forms.py:100 app/main/routes.py:312
 #: app/main/routes.py:374
 msgid "Library File"
-msgstr "库文件"
+msgstr ""
 
 #: app/main/forms.py:77 app/main/forms.py:102
 msgid "Library File Depend"
-msgstr "依赖库文件"
+msgstr ""
 
 #: app/main/forms.py:78 app/main/forms.py:103
 msgid "Library File Description"
-msgstr "库文件描述"
+msgstr ""
 
 #: app/main/forms.py:79 app/main/forms.py:104
 msgid "Tenant DB Info File Path"
-msgstr "租户数据库信息文件路径"
+msgstr ""
 
 #: app/main/forms.py:80 app/main/forms.py:105
 msgid "Tip: initial tenant database info."
-msgstr "提示：初始租户数据库信息。"
+msgstr ""
 
 #: app/main/forms.py:92 app/main/forms.py:118
 msgid "Please use a different app type name."
-msgstr "请使用其他应用类型名称。"
+msgstr ""
 
 #: app/main/forms.py:129
 msgid "Please use a different app admin name."
-msgstr "请使用其他应用管理员名称。"
+msgstr ""
 
 #: app/main/forms.py:137
 msgid "Admin Name"
-msgstr "管理员名称"
+msgstr ""
 
 #: app/main/forms.py:138 app/main/forms.py:140
 msgid "Admin Password"
-msgstr "管理员密码"
+msgstr ""
 
 #: app/main/forms.py:143 app/main/forms.py:169 app/main/forms.py:289
 #: app/main/forms.py:292
 msgid "App"
-msgstr "应用"
+msgstr ""
 
 #: app/main/forms.py:144
 msgid "Please choose"
-msgstr "请选择"
+msgstr ""
 
 #: app/main/forms.py:157
 msgid "Please use a different app tenant name."
-msgstr "请使用其他租户名称。"
+msgstr ""
 
 #: app/main/forms.py:165 app/main/forms.py:203 app/main/forms.py:206
 #: app/main/forms.py:248 app/main/forms.py:251
 msgid "Tenant Name"
-msgstr "租户名称"
+msgstr ""
 
 #: app/main/forms.py:166 app/main/forms.py:168
 msgid "Tenant Password"
-msgstr "租户密码"
+msgstr ""
 
 #: app/main/forms.py:171
 msgid "Tenant ID"
-msgstr "租户ID"
+msgstr ""
 
 #: app/main/forms.py:181 app/main/forms.py:226 app/main/forms.py:271
 msgid "Please use a different database name or different driver."
-msgstr "请使用其他数据库名称或驱动。"
+msgstr ""
 
 #: app/main/forms.py:205 app/main/forms.py:250
 msgid "Host Name"
-msgstr "主机名称"
+msgstr ""
 
 #: app/main/forms.py:207 app/main/forms.py:252
 msgid "Database Port"
-msgstr "数据库端口"
+msgstr ""
 
 #: app/main/forms.py:208 app/main/forms.py:253 app/main/routes.py:770
 #: app/main/routes.py:827 app/main/routes.py:1009 app/main/routes.py:1136
 msgid "Is System Extension"
-msgstr "是否系统扩展"
+msgstr ""
 
 #: app/main/forms.py:209 app/main/forms.py:254
 msgid "System Extension"
-msgstr "系统扩展"
+msgstr ""
 
 #: app/main/forms.py:210 app/main/forms.py:255
 msgid "Not System Extension"
-msgstr "非系统扩展"
+msgstr ""
 
 #: app/main/forms.py:211 app/main/forms.py:212 app/main/forms.py:256
 #: app/main/forms.py:257
 msgid "Database Driver"
-msgstr "数据库驱动"
+msgstr ""
 
 #: app/main/forms.py:213 app/main/forms.py:214 app/main/forms.py:258
 #: app/main/forms.py:259
 msgid "Database Name"
-msgstr "数据库名称"
+msgstr ""
 
 #: app/main/forms.py:215 app/main/forms.py:260 app/main/routes.py:1312
 #: app/main/routes.py:1329
 msgid "User Name"
-msgstr "用户名称"
+msgstr ""
 
 #: app/main/forms.py:293
 msgid "Code Repo"
-msgstr "代码仓库"
+msgstr ""
 
 #: app/main/forms.py:298
 msgid "Database Config Path"
-msgstr "数据库配置路径"
+msgstr ""
 
 #: app/main/forms.py:299
 msgid "Tip: Runtime relative path"
-msgstr "提示：运行时相对路径"
+msgstr ""
 
 #: app/main/forms.py:300
 msgid "Remote Login Config Path"
-msgstr "远程登录配置路径"
+msgstr ""
 
 #: app/main/forms.py:301
 msgid "Using Flag"
-msgstr "引用标志"
+msgstr ""
 
 #: app/main/forms.py:302
 msgid "Using Content"
-msgstr "引用内容"
+msgstr ""
 
 #: app/main/forms.py:304
 msgid "Library Path"
-msgstr "库路径"
+msgstr ""
 
 #: app/main/forms.py:305
 msgid "Filter Package Path"
-msgstr "过滤器包地址"
+msgstr ""
 
 #: app/main/forms.py:306
 msgid "Filter Content"
-msgstr "过滤器内容"
+msgstr ""
 
 #: app/main/forms.py:307
 msgid "Filter Config Path"
-msgstr "过滤器配置路径"
+msgstr ""
 
 #: app/main/forms.py:309 app/main/forms.py:311
 msgid "Import Flag"
-msgstr "导入标志"
+msgstr ""
 
 #: app/main/forms.py:310 app/main/forms.py:312
 msgid "Import Content"
-msgstr "导入内容"
+msgstr ""
 
 #: app/main/forms.py:314
 msgid "Call Start Point"
-msgstr "调用起点"
+msgstr ""
 
 #: app/main/forms.py:315
 msgid "Third Party Package"
-msgstr "第三方包"
+msgstr ""
 
 #: app/main/routes.py:53
 msgid "Your post is now live!"
-msgstr "您的帖子已发布！"
+msgstr ""
 
 #: app/main/routes.py:62 app/templates/auth/base_auth.html:21
 #: app/templates/base.html:39 app/templates/index.html:5
 #: app/templates/index.html:9
 msgid "Home"
-msgstr "主页"
+msgstr ""
 
 #: app/main/routes.py:70 app/templates/auth/base_auth.html:22
 #: app/templates/base.html:40 app/templates/index.html:20
@@ -355,11 +354,11 @@ msgstr "主页"
 #: app/templates/registe_manage_base.html:5
 #: app/templates/registe_manage_base.html:9
 msgid "Registe Manage"
-msgstr "注册管理"
+msgstr ""
 
 #: app/main/routes.py:87 app/templates/auth/base_auth.html:23
 msgid "Web App Manage"
-msgstr "应用管理"
+msgstr ""
 
 #: app/main/routes.py:97 app/templates/auth/base_auth.html:24
 #: app/templates/base.html:42 app/templates/index.html:30
@@ -370,350 +369,350 @@ msgstr "应用管理"
 #: app/templates/tenant_service_role_setting.html:6
 #: app/templates/tenant_service_user_setting.html:6
 msgid "Tenant Service"
-msgstr "租户服务"
+msgstr ""
 
 #: app/main/routes.py:113 app/templates/auth/base_auth.html:25
 #: app/templates/base.html:43 app/templates/index.html:35
 msgid "Explore"
-msgstr "浏览"
+msgstr ""
 
 #: app/main/routes.py:141
 msgid "Your changes have been saved."
-msgstr "您的修改已保存。"
+msgstr ""
 
 #: app/main/routes.py:146 app/templates/edit_profile.html:5
 msgid "Edit Profile"
-msgstr "编辑简介"
+msgstr ""
 
 #: app/main/routes.py:155 app/main/routes.py:172
 #, python-format
 msgid "User %(username)s not found."
-msgstr "用户 %(username)s 未找到。"
+msgstr ""
 
 #: app/main/routes.py:158
 msgid "You cannot follow yourself!"
-msgstr "您无法关注自己！"
+msgstr ""
 
 #: app/main/routes.py:162
 #, python-format
 msgid "You are following %(username)s!"
-msgstr "您已关注 %(username)s!"
+msgstr ""
 
 #: app/main/routes.py:175
 msgid "You cannot unfollow yourself!"
-msgstr "您无法取消关注自己！"
+msgstr ""
 
 #: app/main/routes.py:179
 #, python-format
 msgid "You are not following %(username)s."
-msgstr "您已取消关注 %(username)s。"
+msgstr ""
 
 #: app/main/routes.py:219 app/main/routes.py:237 app/main/routes.py:264
 #: app/main/routes.py:298 app/templates/registe_manage_base.html:20
 msgid "App Setting"
-msgstr "应用设置"
+msgstr ""
 
 #: app/main/routes.py:220 app/main/routes.py:265 app/main/routes.py:735
 #: app/main/routes.py:736 app/templates/app_manage_base.html:43
 msgid "App List"
-msgstr "应用列表"
+msgstr ""
 
 #: app/main/routes.py:233
 msgid "New app have been added."
-msgstr "新应用已被添加。"
+msgstr ""
 
 #: app/main/routes.py:238
 msgid "Add New App"
-msgstr "添加新应用"
+msgstr ""
 
 #: app/main/routes.py:254 app/main/routes.py:368 app/main/routes.py:505
 #: app/main/routes.py:639 app/main/routes.py:820 app/main/routes.py:1002
 #: app/main/routes.py:1129
 msgid "Record have been deleted."
-msgstr "记录已被删除。"
+msgstr ""
 
 #: app/main/routes.py:274 app/main/routes.py:388 app/main/routes.py:547
 #: app/main/routes.py:658 app/main/routes.py:843 app/main/routes.py:1025
 #: app/main/routes.py:1152 app/main/routes.py:1281 app/main/routes.py:1360
 msgid "Batch delete operation are not allowed now."
-msgstr "批量删除操作暂时不被允许。"
+msgstr ""
 
 #: app/main/routes.py:289 app/main/routes.py:413
 msgid "App have been edited."
-msgstr "应用已被编辑。"
+msgstr ""
 
 #: app/main/routes.py:299
 msgid "Edit App"
-msgstr "编辑应用"
+msgstr ""
 
 #: app/main/routes.py:312 app/main/routes.py:374
 msgid "Tag Template/Begin"
-msgstr "标签模板/开始"
+msgstr ""
 
 #: app/main/routes.py:312 app/main/routes.py:374
 msgid "Tag Template/End"
-msgstr "标签模板/结束"
+msgstr ""
 
 #: app/main/routes.py:312 app/main/routes.py:374
 msgid "DB Initial Path"
-msgstr "数据库初始化路径"
+msgstr ""
 
 #: app/main/routes.py:314 app/main/routes.py:351 app/main/routes.py:378
 #: app/main/routes.py:425 app/templates/registe_manage_base.html:25
 msgid "App Extension"
-msgstr "应用扩展"
+msgstr ""
 
 #: app/main/routes.py:315 app/main/routes.py:379
 msgid "App Extension List"
-msgstr "应用扩展列表"
+msgstr ""
 
 #: app/main/routes.py:347
 msgid "New app extension have been added."
-msgstr "新的应用扩展已被添加。"
+msgstr ""
 
 #: app/main/routes.py:352
 msgid "Add New App Extension"
-msgstr "添加新的应用扩展"
+msgstr ""
 
 #: app/main/routes.py:409 app/main/routes.py:410 app/main/routes.py:420
 #: app/main/routes.py:421
 msgid "Selected File: "
-msgstr "选择文件: "
+msgstr ""
 
 #: app/main/routes.py:426
 msgid "Edit App Extension"
-msgstr "编辑应用扩展"
+msgstr ""
 
 #: app/main/routes.py:439 app/main/routes.py:511
 msgid "App Manager Name"
-msgstr "应用管理员名称"
+msgstr ""
 
 #: app/main/routes.py:463 app/main/routes.py:486 app/main/routes.py:537
 #: app/main/routes.py:585 app/templates/registe_manage_base.html:30
 msgid "App Manager Setting"
-msgstr "应用管理员设置"
+msgstr ""
 
 #: app/main/routes.py:464 app/main/routes.py:538
 msgid "App Manager List"
-msgstr "应用管理员列表"
+msgstr ""
 
 #: app/main/routes.py:482
 msgid "New app manager have been added."
-msgstr "新的应用管理员已被添加。"
+msgstr ""
 
 #: app/main/routes.py:487
 msgid "Add New App Manager"
-msgstr "添加新的应用管理员"
+msgstr ""
 
 #: app/main/routes.py:575
 msgid "App Admin have been edited."
-msgstr "应用管理员已被编辑。"
+msgstr ""
 
 #: app/main/routes.py:586
 msgid "Edit App Manager"
-msgstr "编辑应用管理员"
+msgstr ""
 
 #: app/main/routes.py:599 app/main/routes.py:645
 msgid "App Tenant Name"
-msgstr "应用租户名称"
+msgstr ""
 
 #: app/main/routes.py:599 app/main/routes.py:645
 msgid "App Tenant ID"
-msgstr "应用租户ID"
+msgstr ""
 
 #: app/main/routes.py:601 app/main/routes.py:622 app/main/routes.py:649
 #: app/main/routes.py:686 app/templates/registe_manage_base.html:35
 msgid "App Tenant Setting"
-msgstr "应用租户设置"
+msgstr ""
 
 #: app/main/routes.py:602 app/main/routes.py:650
 msgid "App Tenant List"
-msgstr "应用租户列表"
+msgstr ""
 
 #: app/main/routes.py:618
 msgid "New Tenant have been added."
-msgstr "新的租户已被添加。"
+msgstr ""
 
 #: app/main/routes.py:623
 msgid "Add New App Tenant"
-msgstr "添加新的应用租户"
+msgstr ""
 
 #: app/main/routes.py:677
 msgid "App Tenant have been edited."
-msgstr "应用租户已被编辑。"
+msgstr ""
 
 #: app/main/routes.py:687
 msgid "Edit App Tenant"
-msgstr "编辑应用租户"
+msgstr ""
 
 #: app/main/routes.py:704
 msgid "Switch current app success!"
-msgstr "当前应用切换成功！"
+msgstr ""
 
 #: app/main/routes.py:753 app/templates/app_manage_base.html:56
 msgid "Online Function"
-msgstr "在线功能"
+msgstr ""
 
 #: app/main/routes.py:754
 msgid "Function Configure"
-msgstr "功能配置"
+msgstr ""
 
 #: app/main/routes.py:770 app/main/routes.py:827 app/main/routes.py:1009
 #: app/main/routes.py:1136
 msgid "Tenant"
-msgstr "租户"
+msgstr ""
 
 #: app/main/routes.py:770 app/main/routes.py:827 app/main/routes.py:1009
 #: app/main/routes.py:1136
 msgid "Database"
-msgstr "数据库"
+msgstr ""
 
 #: app/main/routes.py:770 app/main/routes.py:827 app/main/routes.py:1009
 #: app/main/routes.py:1136
 msgid "IP"
-msgstr "IP地址"
+msgstr ""
 
 #: app/main/routes.py:770 app/main/routes.py:827 app/main/routes.py:1009
 #: app/main/routes.py:1136
 msgid "Port"
-msgstr "端口"
+msgstr ""
 
 #: app/main/routes.py:772 app/main/routes.py:773 app/main/routes.py:832
 #: app/main/routes.py:833 app/main/routes.py:1014 app/main/routes.py:1015
 #: app/main/routes.py:1141 app/main/routes.py:1142
 msgid "Tenant Database List"
-msgstr "租户数据库列表"
+msgstr ""
 
 #: app/main/routes.py:793 app/main/routes.py:975 app/main/routes.py:1102
 msgid "New tenant database have been added."
-msgstr "新的租户数据库已被添加。"
+msgstr ""
 
 #: app/main/routes.py:802 app/main/routes.py:881 app/main/routes.py:984
 #: app/main/routes.py:1063 app/main/routes.py:1111 app/main/routes.py:1190
 msgid "Tenant Database Configure"
-msgstr "租户数据库配置"
+msgstr ""
 
 #: app/main/routes.py:803 app/main/routes.py:985 app/main/routes.py:1112
 msgid "Add New Tenant Database"
-msgstr "添加新的租户数据库"
+msgstr ""
 
 #: app/main/routes.py:868 app/main/routes.py:911 app/main/routes.py:1050
 #: app/main/routes.py:1177
 msgid "Tenant Database have been edited."
-msgstr "租户数据库已被编辑。"
+msgstr ""
 
 #: app/main/routes.py:882 app/main/routes.py:1064 app/main/routes.py:1191
 msgid "Edit Tenant Database"
-msgstr "编辑租户数据库"
+msgstr ""
 
 #: app/main/routes.py:938 app/main/routes.py:939
 msgid "Edit Code Information"
-msgstr "编辑代码信息"
+msgstr ""
 
 #: app/main/routes.py:953
 msgid "Mirror Name"
-msgstr "镜像名称"
+msgstr ""
 
 #: app/main/routes.py:953
 msgid "Created Time"
-msgstr "创建时间"
+msgstr ""
 
 #: app/main/routes.py:955
 msgid "Mirror Manage"
-msgstr "镜像管理"
+msgstr ""
 
 #: app/main/routes.py:956 app/templates/app_manage_base.html:85
 msgid "Mirror List"
-msgstr "镜像列表"
+msgstr ""
 
 #: app/main/routes.py:1079
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #: app/main/routes.py:1079
 msgid "Mirror"
-msgstr "镜像"
+msgstr ""
 
 #: app/main/routes.py:1079
 msgid "Instance Number"
-msgstr "实例数量"
+msgstr ""
 
 #: app/main/routes.py:1079
 msgid "State"
-msgstr "状态"
+msgstr ""
 
 #: app/main/routes.py:1079
 msgid "Action"
-msgstr "动作"
+msgstr ""
 
 #: app/main/routes.py:1080
 msgid "Publish"
-msgstr "发布"
+msgstr ""
 
 #: app/main/routes.py:1080
 msgid "Adjust"
-msgstr "调整"
+msgstr ""
 
 #: app/main/routes.py:1080
 msgid "Restart"
-msgstr "重启"
+msgstr ""
 
 #: app/main/routes.py:1080
 msgid "Stop"
-msgstr "停止"
+msgstr ""
 
 #: app/main/routes.py:1080
 msgid "Destroy"
-msgstr "销毁"
+msgstr ""
 
 #: app/main/routes.py:1082 app/templates/app_manage_base.html:91
 msgid "Service Deploy"
-msgstr "服务部署"
+msgstr ""
 
 #: app/main/routes.py:1083
 msgid "Service List"
-msgstr "服务列表"
+msgstr ""
 
 #: app/main/routes.py:1209
 msgid "Customized Function"
-msgstr "定制功能"
+msgstr ""
 
 #: app/main/routes.py:1210
 msgid "Function Root"
-msgstr "功能根节点"
+msgstr ""
 
 #: app/main/routes.py:1219
 msgid "You can only customize version!"
-msgstr "您只能定制版本！"
+msgstr ""
 
 #: app/main/routes.py:1233
 msgid "Role Name"
-msgstr "角色名称"
+msgstr ""
 
 #: app/main/routes.py:1236 app/main/routes.py:1253 app/main/routes.py:1270
 #: app/main/routes.py:1295 app/main/routes.py:1315 app/main/routes.py:1332
 #: app/main/routes.py:1349 app/main/routes.py:1374
 msgid "Customer List"
-msgstr "客户列表"
+msgstr ""
 
 #: app/main/routes.py:1237 app/main/routes.py:1254 app/main/routes.py:1271
 #: app/main/routes.py:1296
 msgid "Role List"
-msgstr "角色列表"
+msgstr ""
 
 #: app/main/routes.py:1312 app/main/routes.py:1329
 msgid "Belonged Role"
-msgstr "所属角色"
+msgstr ""
 
 #: app/main/routes.py:1316 app/main/routes.py:1333 app/main/routes.py:1350
 #: app/main/routes.py:1375
 msgid "User List"
-msgstr "用户列表"
+msgstr ""
 
 #: app/templates/_post.html:14
 #, python-format
 msgid "%(username)s said %(when)s"
-msgstr "%(username)s! 发表于 %(when)s"
+msgstr ""
 
 #: app/templates/app_manage_app_list.html:6
 #: app/templates/app_manage_base.html:5 app/templates/app_manage_base.html:9
@@ -724,242 +723,243 @@ msgstr "%(username)s! 发表于 %(when)s"
 #: app/templates/app_manage_service_deploy.html:6 app/templates/base.html:41
 #: app/templates/index.html:25 app/templates/index_app_manage.html:4
 msgid "App Manage"
-msgstr "应用管理"
+msgstr ""
 
 #: app/templates/app_manage_app_list.html:54
 #: app/templates/app_manage_mirror_list.html:105
 #: app/templates/tenant_service_role_setting.html:109
 #: app/templates/tenant_service_user_setting.html:110
 msgid "System"
-msgstr "系统"
+msgstr ""
 
 #: app/templates/app_manage_base.html:14
 #: app/templates/tenant_service_base.html:14
 msgid "Assosciated App:"
-msgstr "关联应用："
+msgstr ""
 
 #: app/templates/app_manage_base.html:22
 #: app/templates/tenant_service_base.html:22
 msgid "Choose"
-msgstr "选择"
+msgstr ""
 
 #: app/templates/app_manage_base.html:38 app/templates/index.html:15
 #: app/templates/registe_manage_base.html:15
 #: app/templates/tenant_service_base.html:38
 msgid "Dashboard"
-msgstr "控制台"
+msgstr ""
 
 #: app/templates/app_manage_base.html:48
 msgid "App Configure"
-msgstr "应用配置"
+msgstr ""
 
 #: app/templates/app_manage_base.html:62
 msgid "Tenant Database"
-msgstr "租户数据库"
+msgstr ""
 
 #: app/templates/app_manage_base.html:68
 msgid "Code Information"
-msgstr "代码信息"
+msgstr ""
 
 #: app/templates/app_manage_base.html:77
 msgid "App Deploy"
-msgstr "应用部署"
+msgstr ""
 
 #: app/templates/app_manage_code_configure.html:86
 #: app/templates/app_manage_database_configure.html:106
 msgid "yes"
-msgstr "是"
+msgstr ""
 
 #: app/templates/app_manage_code_configure.html:87
 #: app/templates/app_manage_database_configure.html:107
 msgid "no"
-msgstr "否"
+msgstr ""
 
 #: app/templates/app_manage_function_configure.html:76
 #: app/templates/tenant_service_customize_function.html:74
 msgid "Software Version"
-msgstr "软件版本"
+msgstr ""
 
 #: app/templates/app_manage_function_configure.html:78
 #: app/templates/app_manage_function_configure.html:116
 #: app/templates/tenant_service_customize_function.html:76
 msgid "Function Package"
-msgstr "功能包"
+msgstr ""
 
 #: app/templates/app_manage_function_configure.html:101
 #: app/templates/tenant_service_customize_function.html:101
 msgid "Initial"
-msgstr "初始化"
+msgstr ""
 
 #: app/templates/app_manage_function_configure.html:118
 #: app/templates/tenant_service_customize_function.html:78
 msgid "Atomic Function"
-msgstr "原子功能"
+msgstr ""
 
 #: app/templates/app_manage_mirror_list.html:104
 #: app/templates/app_manage_service_deploy.html:106
 msgid "reg.oa.com/landun/landun:1.0.0"
-msgstr "reg.oa.com/landun/landun:1.0.0"
+msgstr ""
 
 #: app/templates/app_manage_mirror_list.html:106
 msgid "2018-03-03T14:21:44Z"
-msgstr "2018-03-03T14:21:44Z"
+msgstr ""
 
 #: app/templates/app_manage_service_deploy.html:105
 msgid "/landun-server-1519456210010866296"
-msgstr "/landun-server-1519456210010866296"
+msgstr ""
 
 #: app/templates/app_manage_service_deploy.html:107
 msgid "Running"
-msgstr "运行中"
+msgstr ""
 
 #: app/templates/auth/base_auth.html:4 app/templates/base.html:4
 msgid "Welcome to MTAP"
-msgstr "欢迎来到MTAP"
+msgstr ""
 
 #: app/templates/auth/base_auth.html:38 app/templates/base.html:56
 msgid "Login"
-msgstr "登录"
+msgstr ""
 
 #: app/templates/auth/base_auth.html:40 app/templates/base.html:58
 msgid "Profile"
-msgstr "简介"
+msgstr ""
 
 #: app/templates/auth/base_auth.html:41 app/templates/base.html:59
 msgid "Logout"
-msgstr "登出"
+msgstr ""
 
 #: app/templates/base.html:117
 msgid "Confirm"
-msgstr "确认"
+msgstr ""
 
 #: app/templates/base.html:119
 msgid "Cancel"
-msgstr "取消"
+msgstr ""
 
 #: app/templates/index.html:41 app/templates/index_app_manage.html:9
 #: app/templates/index_registe_manage.html:5
 #: app/templates/index_tenant_service.html:9
 #, python-format
 msgid "Hi, %(username)s!"
-msgstr "你好, %(username)s!"
+msgstr ""
 
 #: app/templates/index.html:53 app/templates/index_app_manage.html:22
 #: app/templates/index_registe_manage.html:17
 #: app/templates/index_tenant_service.html:21 app/templates/user.html:31
 msgid "Newer posts"
-msgstr "新帖子"
+msgstr ""
 
 #: app/templates/index.html:58 app/templates/index_app_manage.html:27
 #: app/templates/index_registe_manage.html:22
 #: app/templates/index_tenant_service.html:26 app/templates/user.html:36
 msgid "Older posts"
-msgstr "旧帖子"
+msgstr ""
 
 #: app/templates/registe_manage_app_extension.html:95
 msgid "Operation"
-msgstr "操作"
+msgstr ""
 
 #: app/templates/search.html:4
 msgid "Search Results"
-msgstr "搜索结果"
+msgstr ""
 
 #: app/templates/search.html:13
 msgid "Previous results"
-msgstr "上一批结果"
+msgstr ""
 
 #: app/templates/search.html:18
 msgid "Next results"
-msgstr "下一批结果"
+msgstr ""
 
 #: app/templates/tenant_service_base.html:43
 msgid "Customize Functiuon"
-msgstr "定制功能"
+msgstr ""
 
 #: app/templates/tenant_service_base.html:48
 msgid "Role Setting"
-msgstr "角色设置"
+msgstr ""
 
 #: app/templates/tenant_service_base.html:53
 msgid "User Setting"
-msgstr "用户设置"
+msgstr ""
 
 #: app/templates/tenant_service_role_setting.html:104
 #: app/templates/tenant_service_user_setting.html:105
 msgid "Role"
-msgstr "角色"
+msgstr ""
 
 #: app/templates/tenant_service_user_setting.html:104
 msgid "u"
-msgstr "u"
+msgstr ""
 
 #: app/templates/user.html:8
 msgid "User"
-msgstr "用户"
+msgstr ""
 
 #: app/templates/user.html:11
 msgid "Last seen on"
-msgstr "上次浏览于"
+msgstr ""
 
 #: app/templates/user.html:13
 #, python-format
 msgid "%(count)d followers"
-msgstr "%(count)d 关注者"
+msgstr ""
 
 #: app/templates/user.html:13
 #, python-format
 msgid "%(count)d following"
-msgstr "%(count)d 关注中"
+msgstr ""
 
 #: app/templates/user.html:15
 msgid "Edit your profile"
-msgstr "编辑您的简介"
+msgstr ""
 
 #: app/templates/user.html:17
 msgid "Follow"
-msgstr "关注"
+msgstr ""
 
 #: app/templates/user.html:19
 msgid "Unfollow"
-msgstr "取消关注"
+msgstr ""
 
 #: app/templates/auth/login.html:6 app/templates/auth/register.html:6
 #, python-format
 msgid "%(typeName)s"
-msgstr "%(typeName)s"
+msgstr ""
 
 #: app/templates/auth/login.html:14
 msgid "New User?"
-msgstr "新用户？"
+msgstr ""
 
 #: app/templates/auth/login.html:14
 msgid "Click to Register!"
-msgstr "点击注册！"
+msgstr ""
 
 #: app/templates/auth/login.html:16
 msgid "Forgot Your Password?"
-msgstr "忘记密码？"
+msgstr ""
 
 #: app/templates/auth/login.html:17
 msgid "Click to Reset It"
-msgstr "点击重置密码"
+msgstr ""
 
 #: app/templates/auth/reset_password.html:5
 msgid "Reset Your Password"
-msgstr "重置您的密码"
+msgstr ""
 
 #: app/templates/errors/404.html:4
 msgid "Not Found"
-msgstr "您访问的页面不存在"
+msgstr ""
 
 #: app/templates/errors/404.html:5 app/templates/errors/500.html:6
 msgid "Back"
-msgstr "返回"
+msgstr ""
 
 #: app/templates/errors/500.html:4
 msgid "An unexpected error has occurred"
-msgstr "发生了一个意料之外的错误"
+msgstr ""
 
 #: app/templates/errors/500.html:5
 msgid "The administrator has been notified. Sorry for the inconvenience!"
-msgstr "系统已经通知了管理员。对您造成的不便感到抱歉！"
+msgstr ""
+
