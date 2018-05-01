@@ -1,5 +1,11 @@
 {% extends "tenant_service_base.html" %}
-{% import "_wtf.html" as _wtf%}
+{% import "_wtf.html" as _wtf %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="../static/jstree/dist/themes/default/style.min.css">
+    <script src="../static/pinyin4js/dist/pinyin4js.js"></script>
+{% endblock %}
 
 {% block subtitle2 %}
     <a href={{ url_for('main.index_tenant') }}>
@@ -7,27 +13,27 @@
     </a>
     /
     {% if not addTitle and  not editTitle %}
-    <a style="color: dodgerblue;" href={{ url_for('main.tenant_service_role_setting') }}>
-        {{  title }}
-    </a>
+        <a style="color: dodgerblue;" href={{ url_for('main.tenant_service_role_setting') }}>
+            {{ title }}
+        </a>
     {% endif %}
     {% if addTitle %}
         <a href={{ url_for('main.tenant_service_role_setting') }}>
-        {{  title }}
+            {{ title }}
         </a>
         /
         <a style="color: dodgerblue;" href={{ url_for('main.tenant_service_role_setting_add') }}>
-        {{  addTitle }}
-    </a>
+            {{ addTitle }}
+        </a>
     {% endif %}
     {% if editTitle %}
         <a href={{ url_for('main.tenant_service_role_setting') }}>
-        {{  title }}
+            {{ title }}
         </a>
         /
         <a style="color: dodgerblue;" href={{ url_for('main.tenant_service_role_setting_edit', id=0) }}>
-        {{  editTitle }}
-    </a>
+            {{ editTitle }}
+        </a>
     {% endif %}
 {% endblock %}
 
@@ -35,38 +41,73 @@
     {% if form %}
         <table class="table table-striped table-bordered">
             <thead>
-                <tr>
-                    <th>
-                        <span class="icon fa fa-pencil" style="padding: 10px"></span>
-                        <span class="title h3">{{ tableName }}</span>
-                        <a href={{ url_for('main.tenant_service_role_setting') }}>
-                            <span style="float: right; padding: 10px; padding-right: 27px" class="icon fa fa-reply fa-fw"></span>
-                        </a>
-                        <button style="float: right;" class="btn btn-info btn-xs" onclick="submitForm()">
-                            <span class="icon fa fa-save fa-fw"></span>
-                        </button>
-                    </th>
-                </tr>
+            <tr>
+                <th>
+                    <span class="icon fa fa-pencil" style="padding: 10px"></span>
+                    <span class="title h3">{{ tableName }}</span>
+                    <a href={{ url_for('main.tenant_service_role_setting') }}>
+                        <span style="float: right; padding: 10px; padding-right: 27px"
+                              class="icon fa fa-reply fa-fw"></span>
+                    </a>
+                    <button style="float: right;" class="btn btn-info btn-xs" onclick="check()">
+                        <span class="icon fa fa-save fa-fw"></span>
+                    </button>
+                </th>
+            </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th>
-                        {{ _wtf.quick_form(form, form_type='horizontal') }}
-                    </th>
-                </tr>
+            <tr>
+                <th>
+                    <div align="center" class="form-group">
+                        <label style="line-height: 30px" class="col-sm-1 control-label" for="input-name">{{ _('Role Name') }}</label>
+                        <div class="col-sm-11">
+                            <input type="text" readonly="readonly" name="name" value="{{ role_name }}" id="input-name"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div id="jstree_demo_1" class="demo">
+                            </div>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th>
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-list"></i>{{ _('Allocated Function') }}</h3>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div id="jstree_demo_2" class="demo">
+                            </div>
+                        </div>
+                    </div>
+                </th>
+            </tr>
             </tbody>
         </table>
-    <br>
+        <br>
     {% endif %}
     {% if not form %}
-    <table class="table table-striped table-bordered">
-        <thead>
+        <table class="table table-striped table-bordered">
+            <thead>
             <tr>
                 <th>
                     <span class="icon fa fa-bars" style="padding: 10px"></span>
-                    <span class="title h3">{{  tableName }}</span>
+                    <span class="title h3">{{ tableName }}</span>
                     <a href={{ url_for('main.tenant_service_role_setting') }}>
-                        <span style="float: right; padding: 10px; padding-right: 27px;" class="icon fa fa-refresh fa-fw"></span>
+                        <span style="float: right; padding: 10px; padding-right: 27px;"
+                              class="icon fa fa-refresh fa-fw"></span>
                     </a>
                     <a href={{ url_for('main.tenant_service_role_setting_delete_select') }}>
                         <span style="float: right; padding: 10px;" class="icon fa fa-trash-o fa-fw"></span>
@@ -76,105 +117,277 @@
                     </a>
                 </th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr>
                 <th>
                     <table class="table table-striped table-bordered table-hover">
                         <thead>
-                            <tr>
-                                {% if isCheck %}
+                        <tr>
+                            {% if isCheck %}
                                 <th width="10px">
                                     <input type="checkbox" name="selectCheckbox" title=""
                                            onchange="selectStateChange('checkbox')">
                                 </th>
-                                {% endif %}
-                                {% for t in tHead %}
+                            {% endif %}
+                            {% for t in tHead %}
                                 <th>{{ t }}</th>
-                                {% endfor %}
-                                <th width="30px">Operation</th>
-                            </tr>
+                            {% endfor %}
+                            <th width="30px">Operation</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {% for d in data %}
-                                <tr>
-                                    {% if isCheck %}
+                        {% for d in data %}
+                            <tr>
+                                {% if isCheck %}
                                     <th><input type="checkbox" name="checkbox" title="" value="d.id"></th>
-                                    {% endif %}
-                                    <th>{{ _('Role') }}{{ d.id }}</th>
-                                    <th>
-                                        {% if AppAdmin.query.filter(AppAdmin.id==d.creater_id).first().name %}
-                                        {{ AppAdmin.query.filter(AppAdmin.id==d.creater_id).first().name }}
-                                        {% else %}
+                                {% endif %}
+                                <th>{{ d.name }}</th>
+                                <th>
+                                    {% if current_tenant_name %}
+                                        {{ current_tenant_name }}
+                                    {% else %}
                                         {{ _('System') }}
-                                        {% endif %}
-                                    </th>
-                                    <th>{{ d.name }}</th>
-                                    <th>
-                                        {% if isEdit %}
+                                    {% endif %}
+                                </th>
+                                <th>{{ current_selected_app_name }}</th>
+                                <th>
+                                    <a href={{ url_for('main.tenant_service_role_setting_allocate', id=d.id) }}>
+                                        <span class="icon fa fa-anchor fa-fw"></span>
+                                    </a>
+                                    {% if isEdit %}
                                         <a href={{ url_for('main.tenant_service_role_setting_edit', id=d.id) }}>
                                             <span class="icon fa fa-pencil fa-fw"></span>
                                         </a>
-                                        {% endif %}
-                                        {% if isDelete %}
+                                    {% endif %}
+                                    {% if isDelete %}
                                         <a href={{ url_for('main.tenant_service_role_setting_delete', id=d.id) }}>
                                             <span class="icon fa fa-trash-o fa-fw"></span>
                                         </a>
-                                        {% endif %}
-                                    </th>
-                                </tr>
-                            {% endfor %}
+                                    {% endif %}
+                                </th>
+                            </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </th>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
     {% endif %}
 {% endblock %}
 
 {% block scripts %}
     {{ super() }}
+    <script src="../static/jstree/dist/jstree.min.js"></script>
     <script type="text/javascript">
-        function submitForm(){
+        function submitForm() {
             $('#submitButton').click()
         }
 
         function confirm() {
-            var data={
-                'name':'execute'
+            var data = {
+                'name': 'execute'
             };
             $.ajax({
-                type:'POST',
-                url:'{{url_for("main.tenant_service_role_setting_delete", id=0)}}',
-                data:JSON.stringify(data),  //转变传递的参数为字符串格式
-                contentType:'application/json; charset=UTF-8', //指定传递给服务器的是Json格式数据
-                dataType:'json',//希望服务器返回json格式的数据
-                success:function(data){
+                type: 'POST',
+                url: '{{url_for("main.tenant_service_role_setting_delete", id=0)}}',
+                data: JSON.stringify(data),  //转变传递的参数为字符串格式
+                contentType: 'application/json; charset=UTF-8', //指定传递给服务器的是Json格式数据
+                dataType: 'json',//希望服务器返回json格式的数据
+                success: function (data) {
                     $('#closeConfirmMessage').click();
-{#                    window.location.reload()#}
+                    {#                    window.location.reload()#}
                     window.location.href = '/tenant_service_role_setting'
                 }
             });
         }
 
-        function selectStateChange(objName){
+        function selectStateChange(objName) {
             index = {"selectCheckbox": 0};
             var me = document.getElementsByName("selectCheckbox")[index["selectCheckbox"]].checked;
-            var objNameList=document.getElementsByName(objName);
+            var objNameList = document.getElementsByName(objName);
             var i = 0;
-            if(null!=objNameList){
-{#                alert("全选操作");#}
+            if (null != objNameList) {
+                {#                alert("全选操作");#}
                 if (me == true)
-                    for(i=0;i<objNameList.length;i++){
-                        objNameList[i].checked=true;
+                    for (i = 0; i < objNameList.length; i++) {
+                        objNameList[i].checked = true;
                     }
                 else {
-                    for(i=0;i<objNameList.length;i++){
-                        objNameList[i].checked=false;
+                    for (i = 0; i < objNameList.length; i++) {
+                        objNameList[i].checked = false;
                     }
                 }
             }
+        }
+    </script>
+
+    <script type="text/javascript">
+        var versionToFunctionFileName = null;
+        var allocatedVersionToFunctionFileName = null;
+        $.post('{{ url_for('main.get_tenant_customize_file_path', tag='version2function.json') }}', function (data) {
+            if (data.result == 'success') {
+                versionToFunctionFileName = data.filePath;
+                if (versionToFunctionFileName) {
+                    buildTree('jstree_demo_1', versionToFunctionFileName + "?number=" + Math.random());
+                }
+            }
+        });
+        $.post('{{ url_for('main.get_role_customize_file_path', tag='version2function.json') }}', function (data) {
+            if (data.result == 'success') {
+                allocatedVersionToFunctionFileName = data.filePath;
+                if (allocatedVersionToFunctionFileName) {
+                    buildTree2('jstree_demo_2', allocatedVersionToFunctionFileName + "?number=" + Math.random());
+                }
+            }
+        });
+
+        function buildTree(id, url) {
+            $('#' + id).jstree({
+                "core": {
+                    "multiple": true,
+                    "animation": 0,
+                    "check_callback": true,
+                    "themes": {"stripes": true},
+                    'data': {
+                        'url': function (node) {
+                            return url;
+                        },
+                        {#                        'data': function (node) {#}
+                        {#                            return {'id': node.id};#}
+                        {#                        }#}
+                        "dataType": "json"
+                    }
+                },
+                "types": {
+                    "#": {
+                        "max_children": 1,
+                        "max_depth": 10,
+                        "valid_children": ["root"]
+                    },
+                    "root": {
+                        "valid_children": ["default"]
+                    },
+                    "default": {
+                        "valid_children": ["default", "file"]
+                    },
+                    "file": {
+                        "valid_children": []
+                    }
+                },
+                "plugins": [
+                    "dnd", "search",
+                    "state", "types", "wholerow"
+                ]
+            }).bind("select_node.jstree", function (event, data) {
+                $('#' + id).jstree(true).select_node(data.node.parents);
+                for (var i = data.node.children.length - 1; i >= 0; i--) {
+                    if ($('#' + id).jstree(true).is_selected(data.node.children[i])) {
+                        return
+                    }
+                }
+                $('#' + id).jstree(true).select_node(data.node.children);
+            }).bind("deselect_node.jstree", function (event, data) {
+                $('#' + id).jstree(true).deselect_node(data.node.children);
+            }).bind("ready.jstree", function (event, data) {
+                $('#' + id).jstree(true).deselect_all();
+            });
+        }
+        function buildTree2(id, url) {
+            $('#' + id).jstree({
+                "core": {
+                    "multiple": true,
+                    "animation": 0,
+                    "check_callback": true,
+                    "themes": {"stripes": true},
+                    'data': {
+                        'url': function (node) {
+                            return url;
+                        },
+                        {#                        'data': function (node) {#}
+                        {#                            return {'id': node.id};#}
+                        {#                        }#}
+                        "dataType": "json"
+                    }
+                },
+                "types": {
+                    "#": {
+                        "max_children": 1,
+                        "max_depth": 10,
+                        "valid_children": ["root"]
+                    },
+                    "root": {
+                        "valid_children": ["default"]
+                    },
+                    "default": {
+                        "valid_children": ["default", "file"]
+                    },
+                    "file": {
+                        "valid_children": []
+                    }
+                },
+                "plugins": [
+                    "dnd", "search",
+                    "state", "types", "wholerow"
+                ]
+            }).bind("ready.jstree", function (event, data) {
+                $('#' + id).jstree(true).deselect_all();
+            });
+        }
+
+        function check() {
+            var nodes = $('#jstree_demo_1').jstree(true).get_selected("#", {"full": true});
+            // '#'
+            if (!nodes) {
+                alert({{ _('Please choose') }});
+                return
+            }
+
+            var json = [];
+            for (var i = 0; i < nodes.length; i++) {
+                var v = $('#jstree_demo_1').jstree(true).get_json(nodes[i].id, {
+                    "flat": true,
+                    "no_a_attr": true,
+                    "no_li_attr": true,
+                    "no_state": true,
+                    "no_data": false,
+                    "no_children": true
+                });
+                json.push(v[0]);
+            }
+            //添加role_tag前缀
+            for (var i = json.length - 1; i >= 0; i--) {
+                json[i]["id"] = '{{ role_tag_prefix }}'+json[i]["id"];
+                if (json[i]["parent"] != "#") {
+                    json[i]["parent"] = '{{ role_tag_prefix }}'+json[i]["parent"];
+                }
+            }
+            {#            $.post({{ url_for('main.tenant_service_role_setting_save') }},#}
+            {#                    {"roleId":{{ role_id }}, "json": JSON.stringify(json)}, function (data) {#}
+            {#                if (data.code == 0) {#}
+            {#                    window.location.href =#}
+            {#                    {{.current_action}}#}
+            {#                } else {#}
+            {#                    alert(data.message)#}
+            {#                }#}
+            {#            });#}
+
+            var tag = 'version2function.json';
+            var json_str = JSON.stringify(json);
+            url = '{{ url_for('main.tenant_service_role_setting_save') }}';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: JSON.stringify({"tag": tag, "json": json_str}),
+                contentType: 'application/json; charset=UTF-8',
+                dataType: 'json',
+                success: function (data) {
+                    window.location.href = '{{ url_for('main.tenant_service_role_setting') }}'
+                },
+                error: function (xhr, type) {
+                }
+            });
         }
     </script>
 {% endblock %}

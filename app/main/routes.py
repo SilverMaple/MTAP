@@ -6,6 +6,7 @@
 
 import hashlib
 import os
+import shutil
 import json
 from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request, g, \
@@ -16,8 +17,8 @@ from flask_uploads import UploadSet
 from guess_language import guess_language
 from app import db
 from app.main.forms import EditProfileForm, PostForm, SearchForm, AddAppForm, AddAppExtensionForm, EditAppExtensionForm, \
-    AddAppAdminForm, AddTenantForm, AddTenantDatabaseForm, EditTenantDatabaseForm, AddAppCodeForm
-from app.models import User, Post, App, AppAdmin, AppExpand, AdminToApp, Tenant, TenantDb, AppCode
+    AddAppAdminForm, AddTenantForm, AddTenantDatabaseForm, EditTenantDatabaseForm, AddAppCodeForm, AddRoleForm, AddUserForm
+from app.models import User, Post, App, AppAdmin, AppExpand, AdminToApp, Tenant, TenantDb, AppCode, SaasRole, SaasUser
 from app.translate import translate
 from app.main import bp
 from app.email import follower_notification
@@ -1309,8 +1310,74 @@ def tenant_service_customize_function():
 @bp.route('/tenant_service_customize_function_edit')
 @login_required
 def tenant_service_customize_function_edit():
-    flash(_('You can only customize version!'))
-    return redirect(url_for('main.tenant_service_customize_function'))
+    form = True
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('App Name'), _('App ID'), _('Creator')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    return render_template('tenant_service_customize_function.html', title=_('Customized Function'),
+                           editTitle=_('Customize'),
+                           tableName=_('Function Root'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit, form=form,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/tenant_service_customize_function_save', methods=['GET', 'POST'])
+@login_required
+def tenant_service_customize_function_save():
+    data = request.get_json()
+    tenant_id = Tenant.query.filter(Tenant.id == session['current_tenant_id']).first().tenantid
+    filePath = os.path.join(
+        current_app.config['UPLOAD_FOLDERS']['tenant_service_customize_function'], tenant_id)
+
+    if not os.path.isdir(filePath):
+        os.makedirs(filePath)
+
+    tag = data['tag']
+    new_json = json.loads(data['json'])
+    # print(new_json)
+    # print(tag)
+    if tag in ['version2function.json']:
+        try:
+            new_file = open(os.path.join(filePath, tag), 'w')
+            # new_file.write(json.dumps(new_json))
+            # json.dump(new_json, new_file, ensure_ascii=False, indent=4)
+            json.dump(new_json, new_file, indent=4)
+            new_file.close()
+            flash(_('File save for %(tag)s success.', tag=tag))
+        except Exception as e:
+            print(e)
+            flash(_('File save for %(tag)s failed.', tag=tag))
+    return jsonify({'result': 'success'})
+
+
+@bp.route('/get_tenant_customize_file_path/<tag>', methods=['GET', 'POST'])
+@login_required
+def get_tenant_customize_file_path(tag):
+    tenant_id = Tenant.query.filter(Tenant.id == session['current_tenant_id']).first().tenantid
+    if tag == 'version2function.json':
+        filePath = os.path.join(os.path.join(
+            current_app.config['UPLOAD_FOLDERS']['tenant_service_customize_function'], tenant_id), tag)
+        if os.path.isfile(filePath):
+            filePath = os.path.join(os.path.join(
+                current_app.config['UPLOAD_FOLDERS']['tenant_service_customize_function_html'], tenant_id), tag)
+            return jsonify({'result': 'success', 'filePath': filePath})
+        # filePath1 = os.path.join(
+        #     current_app.config['UPLOAD_FOLDERS']['tenant_service_customize_function'], tenant_id)
+        # if not os.path.isdir(filePath1):
+        #     os.makedirs(filePath1)
+        #     app_id = App.query.filter(App.id == session['current_selected_app_id']).first().appid
+        #     app_file = os.path.join(os.path.join(
+        #         current_app.config['UPLOAD_FOLDERS']['app_manage_function_configure'], app_id), 'version2package.json')
+        #     shutil.copyfile(app_file, filePath)
+        #     filePath = os.path.join(os.path.join(
+        #         current_app.config['UPLOAD_FOLDERS']['tenant_service_customize_function_html'], tenant_id), tag)
+        #     return jsonify({'result': 'success', 'filePath': filePath})
+    # flash(_('No customize function now!'))
+    return jsonify({'result': 'fail', 'filePath': False})
 
 
 # ---------------------------------------------------------------------------------------
@@ -1324,47 +1391,144 @@ def tenant_service_role_setting():
     isDelete = True
     session['is_delete'] = 'false'
     tHead = [_('Role Name'), _('Creator'), _('App Name')]
-    data = App.query.order_by(db.asc(App.name)).all()
+    data = SaasRole.query.order_by(db.asc(SaasRole.name)).all()
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
     # flash(_('Batch delete operation are not allowed now.'))
-    return render_template('tenant_service_role_setting.html', title=_('Customer List'),
+    return render_template('tenant_service_role_setting.html', title=_('Role List'),
                            tableName=_('Role List'), app_name_list=get_app_name_list(),
                            current_selected_app_name=get_current_selected_app_name(),
-                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isCheck=isCheck, isEdit=isEdit, current_tenant_name=current_tenant_name,
                            isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/tenant_service_role_setting_allocate/<id>', methods=['GET', 'POST'])
+@login_required
+def tenant_service_role_setting_allocate(id):
+    form = True
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    session['current_role_id'] = id
+    tHead = [_('Role Name'), _('Creator'), _('App Name')]
+    data = SaasRole.query.order_by(db.asc(SaasRole.name)).all()
+    role_name = SaasRole.query.filter(SaasRole.id==id).first().name
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
+    # flash(_('Batch delete operation are not allowed now.'))
+    return render_template('tenant_service_role_setting.html', title=_('Role List'),
+                           tableName=_('Allocate Function'), app_name_list=get_app_name_list(), form=form, role_id=id,
+                           current_selected_app_name=get_current_selected_app_name(), role_name=role_name,
+                           isCheck=isCheck, isEdit=isEdit, current_tenant_name=current_tenant_name,
+                           isDelete=isDelete, tHead=tHead, data=data, role_tag_prefix='role_')
+
+
+@bp.route('/tenant_service_role_setting_save', methods=['GET', 'POST'])
+@login_required
+def tenant_service_role_setting_save():
+    data = request.get_json()
+    role_id = session['current_role_id']
+    tenant_id = Tenant.query.filter(Tenant.id == session['current_tenant_id']).first().tenantid
+    filePath = os.path.join(os.path.join(
+        current_app.config['UPLOAD_FOLDERS']['tenant_service_role_setting'], tenant_id), role_id)
+
+    if not os.path.isdir(filePath):
+        os.makedirs(filePath)
+
+    tag = data['tag']
+    new_json = json.loads(data['json'])
+    print(new_json)
+    print(tag)
+    if tag in ['version2function.json']:
+        try:
+            new_file = open(os.path.join(filePath, tag), 'w')
+            # new_file.write(json.dumps(new_json))
+            # json.dump(new_json, new_file, ensure_ascii=False, indent=4)
+            json.dump(new_json, new_file, indent=4)
+            new_file.close()
+            flash(_('File save for %(tag)s success.', tag=tag))
+        except Exception as e:
+            print(e)
+            flash(_('File save for %(tag)s failed.', tag=tag))
+    return jsonify({'result': 'success'})
+
+
+@bp.route('/get_role_customize_file_path/<tag>', methods=['GET', 'POST'])
+@login_required
+def get_role_customize_file_path(tag):
+    tenant_id = Tenant.query.filter(Tenant.id == session['current_tenant_id']).first().tenantid
+    role_id = session['current_role_id']
+    if tag == 'version2function.json':
+        filePath = os.path.join(os.path.join(os.path.join(
+            current_app.config['UPLOAD_FOLDERS']['tenant_service_role_setting'], tenant_id), role_id), tag)
+        if os.path.isfile(filePath):
+            filePath = os.path.join(os.path.join(os.path.join(
+                current_app.config['UPLOAD_FOLDERS']['tenant_service_role_setting_html'], tenant_id), role_id), tag)
+            return jsonify({'result': 'success', 'filePath': filePath})
+    return jsonify({'result': 'fail', 'filePath': False})
 
 
 @bp.route('/tenant_service_role_setting_add', methods=['GET', 'POST'])
 @login_required
 def tenant_service_role_setting_add():
+    form = AddRoleForm(None)
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
+    if form.validate_on_submit():
+        db.session.add(SaasRole(id=None, name=form.role_name.data, funcdata_mod_time=datetime.now().__str__()))
+        db.session.commit()
+        flash(_('New role have been added.'))
+        return redirect(url_for('main.tenant_service_role_setting'))
+    elif request.method == 'GET':
+        form.creator.data = current_tenant_name
+        form.app_name.data = get_current_selected_app_name()
+        pass
+
     isCheck = True
     isEdit = True
     isDelete = True
     session['is_delete'] = 'false'
     tHead = [_('App Name'), _('App ID'), _('Creator')]
-    data = App.query.order_by(db.asc(App.name)).all()
     # flash(_('Batch delete operation are not allowed now.'))
-    return render_template('tenant_service_role_setting.html', title=_('Customer List'),
-                           tableName=_('Role List'), app_name_list=get_app_name_list(),
+    return render_template('tenant_service_role_setting.html', title=_('Role List'), form=form,
+                           tableName=_('Add Role'), app_name_list=get_app_name_list(), addTitle=_('Add Role'),
                            current_selected_app_name=get_current_selected_app_name(),
-                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
-                           isDelete=isDelete, tHead=tHead, data=data)
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead)
 
 
 @bp.route('/tenant_service_role_setting_delete/<id>', methods=['GET', 'POST'])
 @login_required
 def tenant_service_role_setting_delete(id):
+    if request.method == 'GET':
+        session['current_delete_id'] = id
+    else:
+        data = request.get_json()
+        name = data.get('name')
+        if name == 'execute':
+            current_data = SaasRole.query.filter(SaasRole.id == session['current_delete_id']).first()
+            db.session.delete(current_data)
+            db.session.commit()
+            flash(_('Record have been deleted.'))
+            return jsonify({'result': 'success'})
+
     isCheck = True
     isEdit = True
     isDelete = True
     session['is_delete'] = 'false'
-    tHead = [_('App Name'), _('App ID'), _('Creator')]
-    data = App.query.order_by(db.asc(App.name)).all()
-    # flash(_('Batch delete operation are not allowed now.'))
-    return render_template('tenant_service_role_setting.html', title=_('Customer List'),
+    tHead = [_('Role Name'), _('Creator'), _('App Name')]
+    data = SaasRole.query.order_by(db.asc(SaasRole.name)).all()
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
+    confirmTitle = 'Confirm your choice:'
+    confirmMessage = 'Do you want to delete this record?'
+    return render_template('tenant_service_role_setting.html', title=_('Role List'),
                            tableName=_('Role List'), app_name_list=get_app_name_list(),
                            current_selected_app_name=get_current_selected_app_name(),
-                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
-                           isDelete=isDelete, tHead=tHead, data=data)
+                           isCheck=isCheck, isEdit=isEdit, current_tenant_name=current_tenant_name,
+                           isDelete=isDelete, tHead=tHead, data=data,
+                           confirmTitle=confirmTitle, confirmMessage=confirmMessage)
 
 
 
@@ -1375,20 +1539,40 @@ def tenant_service_role_setting_delete_select():
         return redirect(url_for('main.tenant_service_role_setting'))
 
 
-@bp.route('/tenant_service_role_setting_edit')
+@bp.route('/tenant_service_role_setting_edit/<id>', methods=['GET', 'POST'])
 @login_required
-def tenant_service_role_setting_edit():
+def tenant_service_role_setting_edit(id):
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
+    if session.get('validate_role_name'):
+        form = AddRoleForm(session['validate_role_name'])
+    else:
+        form = AddRoleForm(None)
+    if form.validate_on_submit():
+        current_data = SaasRole.query.filter(SaasRole.id == id).first()
+        current_data.name = form.role_name.data
+        db.session.commit()
+        flash(_('Role have been edited.'))
+        return redirect(url_for('main.tenant_service_role_setting'))
+    elif request.method == 'GET':
+        current_data = SaasRole.query.filter(SaasRole.id == id).first()
+        form.role_name.data = current_data.name
+        form.creator.data = current_tenant_name
+        form.app_name.data = get_current_selected_app_name()
+        session['validate_role_name'] = form.role_name.data
+
     isCheck = True
     isEdit = True
     isDelete = True
     session['is_delete'] = 'false'
-    tHead = [_('App Name'), _('App ID'), _('Creator')]
-    data = App.query.order_by(db.asc(App.name)).all()
-    # flash(_('Batch delete operation are not allowed now.'))
-    return render_template('tenant_service_role_setting.html', title=_('Customer List'),
-                           tableName=_('Role List'), app_name_list=get_app_name_list(),
+    tHead = [_('Role Name'), _('Creator'), _('App Name')]
+    data = SaasRole.query.order_by(db.asc(SaasRole.name)).all()
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
+    return render_template('tenant_service_role_setting.html', title=_('Role List'), form=form,
+                           tableName=_('Edit Role'), app_name_list=get_app_name_list(), editTitle=_('Edit Role'),
                            current_selected_app_name=get_current_selected_app_name(),
-                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isCheck=isCheck, isEdit=isEdit, current_tenant_name=current_tenant_name,
                            isDelete=isDelete, tHead=tHead, data=data)
 
 
@@ -1403,47 +1587,81 @@ def tenant_service_user_setting():
     isDelete = True
     session['is_delete'] = 'false'
     tHead = [_('User Name'), _('Belonged Role'), _('Creator'), _('App Name')]
-    data = App.query.order_by(db.asc(App.name)).all()
-    # flash(_('Batch delete operation are not allowed now.'))
-    return render_template('tenant_service_user_setting.html', title=_('Customer List'),
+    data = SaasUser.query.order_by(db.asc(SaasUser.name)).all()
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
+    return render_template('tenant_service_user_setting.html', title=_('User List'),
                            tableName=_('User List'), app_name_list=get_app_name_list(),
                            current_selected_app_name=get_current_selected_app_name(),
-                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           current_tenant_name=current_tenant_name,
+                           isCheck=isCheck, isEdit=isEdit, SaasRole=SaasRole,
                            isDelete=isDelete, tHead=tHead, data=data)
 
 
 @bp.route('/tenant_service_user_setting_add', methods=['GET', 'POST'])
 @login_required
 def tenant_service_user_setting_add():
+    form = AddUserForm(None)
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
+    if form.validate_on_submit():
+        role_id = SaasRole.query.filter(SaasRole.name == form.role_list.data).first().id
+        db.session.add(SaasUser(id=None, name=form.user_name.data,
+                                password=generate_password_hash(form.user_password.data),
+                                role_id=role_id))
+        db.session.commit()
+        flash(_('New user have been added.'))
+        return redirect(url_for('main.tenant_service_user_setting'))
+    elif request.method == 'GET':
+        form.creator.data = current_tenant_name
+        form.app_name.data = get_current_selected_app_name()
+        pass
+
     isCheck = True
     isEdit = True
     isDelete = True
     session['is_delete'] = 'false'
     tHead = [_('User Name'), _('Belonged Role'), _('Creator'), _('App Name')]
-    data = App.query.order_by(db.asc(App.name)).all()
     # flash(_('Batch delete operation are not allowed now.'))
-    return render_template('tenant_service_user_setting.html', title=_('Customer List'),
-                           tableName=_('User List'), app_name_list=get_app_name_list(),
+    return render_template('tenant_service_user_setting.html', title=_('User List'), form=form,
+                           tableName=_('Add User'), app_name_list=get_app_name_list(), addTitle=_('Add User'),
                            current_selected_app_name=get_current_selected_app_name(),
-                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
-                           isDelete=isDelete, tHead=tHead, data=data)
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead)
 
 
 @bp.route('/tenant_service_user_setting_delete/<id>', methods=['GET', 'POST'])
 @login_required
 def tenant_service_user_setting_delete(id):
+    if request.method == 'GET':
+        session['current_delete_id'] = id
+    else:
+        data = request.get_json()
+        name = data.get('name')
+        if name == 'execute':
+            current_data = SaasUser.query.filter(SaasUser.id == session['current_delete_id']).first()
+            db.session.delete(current_data)
+            db.session.commit()
+            flash(_('Record have been deleted.'))
+            return jsonify({'result': 'success'})
+
     isCheck = True
     isEdit = True
     isDelete = True
     session['is_delete'] = 'false'
-    tHead = [_('App Name'), _('App ID'), _('Creator')]
-    data = App.query.order_by(db.asc(App.name)).all()
-    # flash(_('Batch delete operation are not allowed now.'))
-    return render_template('tenant_service_user_setting.html', title=_('Customer List'),
+    tHead = [_('User Name'), _('Belonged Role'), _('Creator'), _('App Name')]
+    data = SaasUser.query.order_by(db.asc(SaasUser.name)).all()
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
+    confirmTitle = 'Confirm your choice:'
+    confirmMessage = 'Do you want to delete this record?'
+    return render_template('tenant_service_user_setting.html', title=_('User List'),
                            tableName=_('User List'), app_name_list=get_app_name_list(),
                            current_selected_app_name=get_current_selected_app_name(),
-                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
-                           isDelete=isDelete, tHead=tHead, data=data)
+                           isCheck=isCheck, isEdit=isEdit, current_tenant_name=current_tenant_name,
+                           isDelete=isDelete, tHead=tHead, data=data, SaasRole=SaasRole,
+                           confirmTitle=confirmTitle, confirmMessage=confirmMessage)
+
 
 
 
@@ -1454,18 +1672,42 @@ def tenant_service_user_setting_delete_select():
         return redirect(url_for('main.tenant_service_user_setting'))
 
 
-@bp.route('/tenant_service_user_setting_edit')
+@bp.route('/tenant_service_user_setting_edit/<id>', methods=['GET', 'POST'])
 @login_required
-def tenant_service_user_setting_edit():
+def tenant_service_user_setting_edit(id):
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
+    if session.get('validate_user_name'):
+        form = AddUserForm(session['validate_user_name'])
+    else:
+        form = AddUserForm(None)
+    if form.validate_on_submit():
+        current_data = SaasUser.query.filter(SaasUser.id == id).first()
+        current_data.name = form.user_name.data
+        if not form.user_password.data.strip() == '':
+            current_data.password = generate_password_hash(form.user_password.data)
+        current_data.role_id = SaasRole.query.filter(SaasRole.name==form.role_list.data).first().id
+        db.session.commit()
+        flash(_('Role have been edited.'))
+        return redirect(url_for('main.tenant_service_user_setting'))
+    elif request.method == 'GET':
+        current_data = SaasUser.query.filter(SaasUser.id == id).first()
+        form.user_name.data = current_data.name
+        form.role_list.data = SaasRole.query.filter(SaasRole.id==current_data.role_id).first().name
+        form.creator.data = current_tenant_name
+        form.app_name.data = get_current_selected_app_name()
+        session['validate_user_name'] = form.user_name.data
+
     isCheck = True
     isEdit = True
     isDelete = True
     session['is_delete'] = 'false'
-    tHead = [_('App Name'), _('App ID'), _('Creator')]
-    data = App.query.order_by(db.asc(App.name)).all()
-    # flash(_('Batch delete operation are not allowed now.'))
-    return render_template('tenant_service_user_setting.html', title=_('Customer List'),
-                           tableName=_('User List'), app_name_list=get_app_name_list(),
+    tHead = [_('User Name'), _('Belonged Role'), _('Creator'), _('App Name')]
+    data = SaasUser.query.order_by(db.asc(SaasUser.name)).all()
+    current_tenant_id = session['current_tenant_id']
+    current_tenant_name = Tenant.query.filter(Tenant.id == current_tenant_id).first().name
+    return render_template('tenant_service_role_setting.html', title=_('User List'), form=form,
+                           tableName=_('User List'), app_name_list=get_app_name_list(), editTitle=_('Edit User'),
                            current_selected_app_name=get_current_selected_app_name(),
-                           isCheck=isCheck, isEdit=isEdit, AppAdmin=AppAdmin,
+                           isCheck=isCheck, isEdit=isEdit, current_tenant_name=current_tenant_name,
                            isDelete=isDelete, tHead=tHead, data=data)

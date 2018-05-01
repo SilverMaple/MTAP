@@ -262,3 +262,54 @@ class TenantDb(db.Model):
 
     app = relationship('App')
     tenant = relationship('Tenant')
+
+
+class SaasMetedataField(db.Model):
+    __bind_key__ = 'test'
+    __tablename__ = 'saas_metedata_field'
+
+    id = Column(Integer, primary_key=True)
+    identifier = Column(String(50), server_default=text("NULL"))
+    type = Column(String(50), server_default=text("NULL"))
+    version_id = Column(ForeignKey('saas_metedata_field.id'), server_default=text("NULL"))
+
+    version = relationship('SaasMetedataField', remote_side=[id])
+
+
+class SaasRole(db.Model):
+    __bind_key__ = 'test'
+    __tablename__ = 'saas_role'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), server_default=text("NULL"))
+    funcdata_mod_time = Column(String(50), server_default=text("NULL"))
+    funcconf_upload_timestamp = Column(String(30), server_default=text("NULL"))
+    funcmap_upload_timestamp = Column(String(30), server_default=text("NULL"))
+    funcconf_allocate_timestamp = Column(String(30), server_default=text("NULL"))
+    funcmap_autogenerate_timestamp = Column(String(30), server_default=text("NULL"))
+    funcmap_autogenerate_path = Column(String(100), server_default=text("NULL"))
+
+
+class SaasRoleToFuncpack(db.Model):
+    __bind_key__ = 'test'
+    __tablename__ = 'saas_role_to_funcpack'
+
+    id = Column(Integer, primary_key=True)
+    role_id = Column(ForeignKey('saas_role.id'), server_default=text("NULL"))
+    funcpack_id = Column(ForeignKey('saas_metedata_field.id'), server_default=text("NULL"))
+
+    funcpack = relationship('SaasMetedataField')
+    role = relationship('SaasRole')
+
+
+class SaasUser(db.Model):
+    __bind_key__ = 'test'
+    __tablename__ = 'saas_user'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), server_default=text("NULL"))
+    password = Column(String(50), server_default=text("NULL"))
+    role_id = Column(ForeignKey('saas_role.id'), server_default=text("NULL"))
+    access_token = Column(String(50), server_default=text("NULL"))
+
+    role = relationship('SaasRole')

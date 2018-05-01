@@ -12,13 +12,25 @@
         {{ _('Tenant Service') }}
     </a>
     /
-    <a style="color: dodgerblue;" href={{ url_for('main.tenant_service_customize_function') }}>
-        {{ title }}
-    </a>
+    {% if not editTitle %}
+        <a style="color: dodgerblue;" href={{ url_for('main.tenant_service_customize_function') }}>
+            {{ title }}
+        </a>
+    {% endif %}
+    {% if editTitle %}
+        <a href={{ url_for('main.tenant_service_customize_function') }}>
+            {{ title }}
+        </a>
+        /
+        <a style="color: dodgerblue;" href={{ url_for('main.tenant_service_customize_function_edit', id=0) }}>
+            {{ editTitle }}
+        </a>
+    {% endif %}
 {% endblock %}
 
 {% block app_content %}
     {% if form %}
+        <div id="message_div" class="alert alert-info" role="alert">{{ _('You can only customize version!') }}</div>
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
@@ -27,9 +39,9 @@
                     <span class="title h3">{{ tableName }}</span>
                     <a href={{ url_for('main.tenant_service_customize_function') }}>
                         <span style="float: right; padding: 10px; padding-right: 27px"
-                              class="icon fa fa-cloud-upload fa-fw"></span>
+                              class="icon fa fa-reply fa-fw"></span>
                     </a>
-                    <button style="float: right;" class="btn btn-info btn-xs" onclick="submitForm()">
+                    <button style="float: right;" class="btn btn-info btn-xs" onclick="check()">
                         <span class="icon fa fa-save fa-fw"></span>
                     </button>
                 </th>
@@ -38,7 +50,30 @@
             <tbody>
             <tr>
                 <th>
-                    {{ _wtf.quick_form(form, form_type='horizontal') }}
+                    <div class="container-fluid">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-cubes"></i>
+                                    {{ _('Software Version') }}
+                                    <i class="fa fa-caret-right"></i>
+                                    {{ _('Function Package') }}
+                                    <i class="fa fa-caret-right"></i>
+                                    {{ _('Atomic Function') }}
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div id="jstree_demo_1" class="demo">
+                                    </div>
+                                    <div id="jstree_demo_1_init_btn" style="display: none;padding-left: 20px">
+                                        <button type="button" class="btn btn-success"
+                                                onclick="init('package2function.json')">{{ _('Initial') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </th>
             </tr>
             </tbody>
@@ -80,26 +115,7 @@
                             </div>
                             <div class="panel-body">
                                 <div class="row">
-                                    <div id="jstree_demo_1" class="demo jstree jstree-1 jstree-default" role="tree"
-                                         aria-multiselectable="true" tabindex="0" aria-activedescendant="Root"
-                                         aria-busy="false">
-                                        <ul class="jstree-container-ul jstree-children jstree-striped jstree-contextmenu jstree-wholerow-ul jstree-no-dots"
-                                            role="group">
-                                            <li role="treeitem" aria-selected="false" aria-level="1"
-                                                aria-labelledby="Root_anchor" aria-expanded="false" id="Root"
-                                                class="jstree-node  jstree-closed jstree-last">
-                                                <div unselectable="on" role="presentation" class="jstree-wholerow">
-                                                    &nbsp;</div>
-                                                <i class="jstree-icon jstree-ocl" role="presentation"></i><a
-                                                    class="jstree-anchor" href="#" tabindex="-1" id="Root_anchor"><i
-                                                    class="jstree-icon jstree-themeicon"
-                                                    role="presentation"></i>Root</a></li>
-                                        </ul>
-                                    </div>
-                                    <div id="jstree_demo_1_init_btn" style="display: none;padding-left: 20px">
-                                        <button type="button" class="btn btn-success"
-                                                onclick="init(&quot;version2package&quot;)">{{ _('Initial') }}
-                                        </button>
+                                    <div id="jstree_demo_1" class="demo">
                                     </div>
                                 </div>
                             </div>
@@ -124,18 +140,18 @@
             var data = {
                 'name': 'execute'
             };
-{#            $.ajax({#}
-{#                type: 'POST',#}
-{#                url: '{{url_for("main.app_manage_database_configure_delete", id=0)}}',#}
-{#                data: JSON.stringify(data),  //转变传递的参数为字符串格式#}
-{#                contentType: 'application/json; charset=UTF-8', //指定传递给服务器的是Json格式数据#}
-{#                dataType: 'json',//希望服务器返回json格式的数据#}
-{#                success: function (data) {#}
-{#                    $('#closeConfirmMessage').click();#}
-                    {#                    window.location.reload()#}
-{#                    window.location.href = '/app_manage_database_configure'#}
-{#                }#}
-{#            });#}
+            {#            $.ajax({#}
+            {#                type: 'POST',#}
+            {#                url: '{{url_for("main.app_manage_database_configure_delete", id=0)}}',#}
+            {#                data: JSON.stringify(data),  //转变传递的参数为字符串格式#}
+            {#                contentType: 'application/json; charset=UTF-8', //指定传递给服务器的是Json格式数据#}
+            {#                dataType: 'json',//希望服务器返回json格式的数据#}
+            {#                success: function (data) {#}
+            {#                    $('#closeConfirmMessage').click();#}
+            {#                    window.location.reload()#}
+            {#                    window.location.href = '/app_manage_database_configure'#}
+            {#                }#}
+            {#            });#}
         }
 
         function selectStateChange(objName) {
@@ -169,13 +185,154 @@
         }
     </script>
     <script type="text/javascript">
-{#        var versionToFunctionFileName = "../static/upload-conf-tenant/43a3097cf9bbefaa92cb31673257db0c/21232f297a57a5a743894a0e4a801fc3//version2function.json";#}
-        var versionToFunctionFileName = "../static/upload/upload-conf-tenant/test/test//version2function.json";
-        if (versionToFunctionFileName) {
-            buildTree('jstree_demo_1', versionToFunctionFileName + "?number=" + Math.random());
+
+        //深度复制
+        function ObjectClone(src) {
+            var obj = {};
+            for (var i in src) {
+                obj[i] = src[i];
+            }
+            return obj;
+        }
+        function ArrayClone(src) {
+            var len = src.length,
+                    arr = [];
+            for (var i = 0; i < len; i++) {
+                if (typeof src[i] !== "object") {
+                    arr.push(src[i]);
+                } else {
+                    arr.push(ObjectClone(src[i]));
+                }
+            }
+            return arr;
         }
 
-        function buildTree(id, url) {
+
+        var versionToPackageFileName = null;
+        var packageToFunctionFileName = null;
+        if ('{{ form }}' == '') {
+            $.post('{{ url_for('main.get_tenant_customize_file_path', tag='version2function.json') }}', function (data) {
+                if (data.result == 'success') {
+                    versionToFunctionFileName = data.filePath;
+                    console.log(versionToFunctionFileName);
+                    if (versionToFunctionFileName) {
+                        buildTree('jstree_demo_1', versionToFunctionFileName + "?number=" + Math.random());
+                    }
+                }
+            });
+        }
+        else {
+            $.post('{{ url_for('main.get_file_path', tag='version2package.json') }}', function (data) {
+                if (data.result == 'success') {
+                    versionToPackageFileName = data.filePath;
+                    $.post('{{ url_for('main.get_file_path', tag='package2function.json') }}', function (data) {
+                        if (data.result == 'success') {
+                            packageToFunctionFileName = data.filePath;
+                            //显示版本树
+                            if (versionToPackageFileName) {
+                                $.get(versionToPackageFileName + "?number=" + Math.random(), function (data1) {
+                                    if (packageToFunctionFileName) {
+                                        $.get(packageToFunctionFileName + "?number=" + Math.random(), function (data2) {
+                                            data1 = JSON.parse(data1);
+                                            data2 = JSON.parse(data2);
+                                            //整理功能包->原子功能的数据，以节点id为key，节点为value进行存储
+                                            var map1 = new Object();
+                                            //整理功能包->原子功能的数据，以父节点id为key，子节点数组为value进行存储
+                                            var map2 = new Object();
+                                            for (var i = data2.length - 1; i >= 0; i--) {
+                                                if (data2[i]["parent"] != "#") {
+                                                    map1[data2[i]["id"]] = data2[i];
+                                                    if (!map2[data2[i]["parent"]]) {
+                                                        map2[data2[i]["parent"]] = new Array();
+                                                    }
+                                                    map2[data2[i]["parent"]].push(data2[i]);
+                                                }
+                                            }
+                                            //遍历版本->功能包数据，将对应的原子功能加上
+                                            for (var i = data1.length - 1; i >= 0; i--) {
+                                                if (data1[i]["parent"] != "#") {
+                                                    var id = data1[i].id;
+                                                    id = id.substring(id.indexOf('-') + 1);
+                                                    if (map2[id]) {
+                                                        var tmp_prefix = guid() + "-";
+                                                        var newIns = ArrayClone(map2[id]);
+                                                        for (var j = newIns.length - 1; j >= 0; j--) {
+                                                            newIns[j]["id"] = tmp_prefix + newIns[j]["id"];
+                                                            newIns[j]["parent"] = data1[i].id;
+                                                            data1.push(newIns[j]);
+                                                        }
+                                                        //功能包->原子功能的父节点属性可能需要更新到版本->功能包数据
+                                                        var p = map1[id];
+                                                        if (typeof(p.data) == "object" &&
+                                                                p.data["file_path"] &&
+                                                                p.data["item_pattern"]) {
+                                                            data1[i].data = p.data;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            //显示数据
+                                            buildTree('jstree_demo_1', data1);
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+        }
+
+        function guid() {
+            function S4() {
+                return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+            }
+
+            return (S4() + S4() + S4() + S4() + S4() + S4() + S4() + S4());
+        }
+
+        function buildTree(id, data) {
+            $('#' + id).jstree({
+                "core": {
+                    "multiple": false,
+                    "animation": 0,
+                    "check_callback": true,
+                    "themes": {"stripes": true},
+                    'data': data
+                },
+                "types": {
+                    "#": {
+                        "max_children": 1,
+                        "max_depth": 10,
+                        "valid_children": ["root"]
+                    },
+                    "root": {
+                        "valid_children": ["default"]
+                    },
+                    "default": {
+                        "valid_children": ["default", "file"]
+                    },
+                    "file": {
+                        "valid_children": []
+                    }
+                },
+                "plugins": [
+                    "dnd", "search", "state", "types", "wholerow"
+                ]
+            }).bind("ready.jstree", function (event, data) {
+                $('#' + id).jstree(true).deselect_all();
+            }).bind("select_node.jstree", function (event, data) {
+                var node = data.node;
+                if (!node || !node.parents || node.parents.length != 2) {
+                    $("#message_div").html("{{ _('You can only customize version!') }}");
+                } else {
+                    $("#message_div").html("{{ _('You have chosen version: ') }}" + node.text);
+                }
+            });
+        }
+
+        function buildTreeForShow(id, url) {
             $('#' + id).jstree({
                 "core": {
                     "animation": 0,
@@ -185,10 +342,9 @@
                         'url': function (node) {
                             return url;
                         },
-{#                        'data': function (node) {#}
-{#                            return {'id': node.id};#}
-{#                        }#}
-                        "dataType" : "json"
+                        'data': function (node) {
+                            return {'id': node.id};
+                        }
                     }
                 },
                 "types": {
@@ -216,6 +372,59 @@
             });
         }
 
+        function check() {
+            var nodes = $('#jstree_demo_1').jstree(true).get_selected("#", {"full": true});
+            // '#'
+            if (!nodes[0] || !nodes[0].parents || nodes[0].parents.length != 2) {
+                alert("{{ _('You can only customize version!') }}");
+                return
+            }
+            var v = $('#jstree_demo_1').jstree(true).get_json(nodes[0].id, {
+                "flat": true,
+                "no_a_attr": true,
+                "no_li_attr": true,
+                "no_state": true,
+                "no_data": false
+            });
+            //需要将根节点的parent设为'#'
+            v[0].parent = '#';
+            var idMap = {};
+            //去除"x-"部分
+            for (var i = 0; i < v.length; i++) {
+                v[i].id = v[i].id.substring(v[i].id.indexOf('-') + 1);
+                v[i].parent = v[i].parent.substring(v[i].parent.indexOf('-') + 1);
+                v[i].text = v[i].text.substring(v[i].text.indexOf('-') + 1);
+                //更新data属性
+                if (typeof(v[i].data) != "object") {
+                    v[i].data = {};
+                }
+                idMap[v[i].id] = v[i];
+            }
+            {#            var json = JSON.stringify(v);#}
+            {#            $.post('{{ url_for('main.tenant_service_customize_function_save') }}', {"json": json}, function (data) {#}
+            {#                if (data.code == 0) {#}
+            {#                    window.location.href = '{{ url_for('main.tenant_service_customize_function') }}'#}
+            {#                } else {#}
+            {#                    alert(data.message)#}
+            {#                }#}
+            {#            });#}
+            var tag = 'version2function.json';
+            var json = JSON.stringify(v);
+            url = '{{ url_for('main.tenant_service_customize_function_save') }}';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                {#                data: {"tag": tag, "json": json},#}
+                data: JSON.stringify({"tag": tag, "json": json}),
+                contentType: 'application/json; charset=UTF-8',
+                dataType: 'json',
+                success: function (data) {
+                    window.location.href = '{{ url_for('main.tenant_service_customize_function') }}'
+                },
+                error: function (xhr, type) {
+                }
+            });
+        }
     </script>
 {% endblock %}
 

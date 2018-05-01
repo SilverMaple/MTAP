@@ -17,6 +17,7 @@ from app.auth.email import send_password_reset_email
 from app.auth import current_login_type
 from app.auth import LoginType
 from app import auth
+from app.models import SaasRole, SaasUser, SaasMetedataField, SaasRoleToFuncpack
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -32,10 +33,11 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         # set a debug manage id for test
-        session['current_app_manager_id'] = '7'
         if user is None or not user.check_password(form.password.data):
             flash(_('Invalid username or password'))
             return redirect(url_for('auth.login'))
+        init_app_manager()
+        init_tenant_service()
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
@@ -49,6 +51,18 @@ def login():
     if auth.current_login_type == LoginType.TENANT_SERVICE:
         typeName = 'Tenant Service'
     return render_template('auth/login.html', title=_('Sign In'), form=form, typeName=typeName)
+
+
+def init_app_manager():
+    session['current_app_manager_id'] = '7'
+
+
+def init_tenant_service():
+    session['current_tenant_id'] = '6'
+    SaasRole.__bind_key__ = 'test'
+    SaasUser.__bind_key__ = 'test'
+    SaasMetedataField.__bind_key__ = 'test'
+    SaasRoleToFuncpack.__bind_key__ = 'test'
 
 
 @bp.route('/logout')

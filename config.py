@@ -12,6 +12,9 @@ class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_BINDS = {
+        'test': 'sqlite:///' + os.path.join(basedir, 'app/static/db/test/test.db')
+    }
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # MAIL_SERVER = os.environ.get('MAIL_SERVER')
     # MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
@@ -37,4 +40,8 @@ class Config(object):
     UPLOAD_FOLDERS = {'registe_manage_app_extension': 'app\\static\\upload\\upload_app_extension',
                       'app_manage_function_configure': 'app\\static\\upload\\upload_conf_app',
                       'app_manage_function_configure_html': '..\\static\\upload\\upload_conf_app',
+                      'tenant_service_customize_function': 'app\\static\\upload\\upload_conf_tenant',
+                      'tenant_service_customize_function_html': '..\\static\\upload\\upload_conf_tenant',
+                      'tenant_service_role_setting': 'app\\static\\upload\\upload_conf_role',
+                      'tenant_service_role_setting_html': '..\\static\\upload\\upload_conf_role',
                       }

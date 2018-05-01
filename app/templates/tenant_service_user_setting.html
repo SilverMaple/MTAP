@@ -101,24 +101,24 @@
                                     {% if isCheck %}
                                     <th><input type="checkbox" name="checkbox" title="" value="d.id"></th>
                                     {% endif %}
-                                    <th>{{ _('u') }}{{ d.id }}</th>
-                                    <th>{{ _('Role') }}{{ d.id }}</th>
+                                    <th>{{ d.name }}</th>
+                                    <th>{{ SaasRole.query.filter(SaasRole.id==d.role_id).first().name }}</th>
                                     <th>
-                                        {% if AppAdmin.query.filter(AppAdmin.id==d.creater_id).first().name %}
-                                        {{ AppAdmin.query.filter(AppAdmin.id==d.creater_id).first().name }}
+                                        {% if current_tenant_name %}
+                                        {{ current_tenant_name }}
                                         {% else %}
                                         {{ _('System') }}
                                         {% endif %}
                                     </th>
-                                    <th>{{ d.name }}</th>
+                                    <th>{{ current_selected_app_name }}</th>
                                     <th>
                                         {% if isEdit %}
-                                        <a href={{ url_for('main.tenant_service_role_setting_edit', id=d.id) }}>
+                                        <a href={{ url_for('main.tenant_service_user_setting_edit', id=d.id) }}>
                                             <span class="icon fa fa-pencil fa-fw"></span>
                                         </a>
                                         {% endif %}
                                         {% if isDelete %}
-                                        <a href={{ url_for('main.tenant_service_role_setting_delete', id=d.id) }}>
+                                        <a href={{ url_for('main.tenant_service_user_setting_delete', id=d.id) }}>
                                             <span class="icon fa fa-trash-o fa-fw"></span>
                                         </a>
                                         {% endif %}
@@ -154,7 +154,7 @@
                 success:function(data){
                     $('#closeConfirmMessage').click();
 {#                    window.location.reload()#}
-                    window.location.href = '/tenant_service_role_setting'
+                    window.location.href = '/tenant_service_user_setting'
                 }
             });
         }

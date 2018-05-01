@@ -11,7 +11,7 @@ from wtforms import StringField, SubmitField, TextAreaField, FileField, BooleanF
 from wtforms.validators import ValidationError, DataRequired, Length
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from flask_babel import _, lazy_gettext as _l
-from app.models import User, App, AppExpand, AppAdmin, Tenant, TenantDb
+from app.models import User, App, AppExpand, AppAdmin, Tenant, TenantDb, SaasRole, SaasUser
 
 
 class EditProfileForm(FlaskForm):
@@ -314,4 +314,48 @@ class AddAppCodeForm(FlaskForm):
     call_starting_point = FileField(_l('Call Start Point'), validators=[DataRequired()])
     third_party_packages = FileField(_l('Third Party Package'), validators=[DataRequired()])
 
+    submit = SubmitField(_l('Save'), render_kw={"id": "submitButton"})
+
+class AddRoleForm(FlaskForm):
+    def __init__(self, original_role_name, *args, **kwargs):
+        super(AddRoleForm, self).__init__(*args, **kwargs)
+        self.original_role_name = original_role_name
+
+    def validate_role_name(self, role_name):
+        if role_name.data != self.original_role_name:
+            role_entity = SaasRole.query.filter_by(name=self.role_name.data).first()
+            if role_entity is not None:
+                raise ValidationError(_('Please use a different role name.'))
+
+    role_name = StringField(_l('Role Name'), validators=[DataRequired()], render_kw={"placeholder": _('Role Name')})
+    creator = StringField(_l('Creator'), validators=[DataRequired()], render_kw={'readonly':'readonly'})
+    app_name = StringField(_l('App Name'), validators=[DataRequired()], render_kw={'readonly':'readonly'})
+
+    submit = SubmitField(_l('Save'), render_kw={"id": "submitButton"})
+
+class AddUserForm(FlaskForm):
+    def __init__(self, original_user_name, *args, **kwargs):
+        super(AddUserForm, self).__init__(*args, **kwargs)
+        self.original_user_name = original_user_name
+
+    def validate_user_name(self, user_name):
+        if user_name.data != self.original_user_name:
+            user_entity = SaasUser.query.filter_by(name=self.user_name.data).first()
+            if user_entity is not None:
+                raise ValidationError(_('Please use a different user name.'))
+
+    def query_factory(self=None):
+        return [r.name for r in SaasRole.query.all()]
+
+    def get_pk(obj):
+        return obj
+
+    user_name = StringField(_l('User Name'), validators=[DataRequired()], render_kw={"placeholder": _('User Name')})
+    user_password = PasswordField(_l('Password'),
+                                       description='In edit mode, set null in this field means no modification for current password.',
+                                       render_kw={"placeholder": _('Password')})
+    role_list = QuerySelectField(label=_l('Role'), validators=[DataRequired()], query_factory=query_factory,
+                                get_pk=get_pk, default='Please choose')
+    creator = StringField(_l('Creator'), validators=[DataRequired()], render_kw={'readonly':'readonly'})
+    app_name = StringField(_l('App'), validators=[DataRequired()], render_kw={'readonly':'readonly'})
     submit = SubmitField(_l('Save'), render_kw={"id": "submitButton"})
