@@ -216,7 +216,7 @@
                     versionToFunctionFileName = data.filePath;
                     console.log(versionToFunctionFileName);
                     if (versionToFunctionFileName) {
-                        buildTree('jstree_demo_1', versionToFunctionFileName + "?number=" + Math.random());
+                        buildTreeForShow('jstree_demo_1', versionToFunctionFileName + "?number=" + Math.random());
                     }
                 }
             });
@@ -342,9 +342,10 @@
                         'url': function (node) {
                             return url;
                         },
-                        'data': function (node) {
-                            return {'id': node.id};
-                        }
+{#                        'data': function (node) {#}
+{#                            return {'id': node.id};#}
+{#                        }#}
+                        'dataType': 'json'
                     }
                 },
                 "types": {

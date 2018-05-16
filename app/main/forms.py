@@ -308,8 +308,8 @@ class AddAppCodeForm(FlaskForm):
 
     filter_import_flag = StringField(_l('Import Flag'))
     filter_import_content = FileField(_l('Import Content'))
-    filter_using_flag = StringField(_l('Import Flag'), validators=[DataRequired()])
-    filter_using_content = FileField(_l('Import Content'), validators=[DataRequired()])
+    filter_using_flag = StringField(_l('Using Flag'), validators=[DataRequired()])
+    filter_using_content = FileField(_l('Using Content'), validators=[DataRequired()])
 
     call_starting_point = FileField(_l('Call Start Point'), validators=[DataRequired()])
     third_party_packages = FileField(_l('Third Party Package'), validators=[DataRequired()])

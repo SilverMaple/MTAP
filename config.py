@@ -40,6 +40,8 @@ class Config(object):
     UPLOAD_FOLDERS = {'registe_manage_app_extension': 'app\\static\\upload\\upload_app_extension',
                       'app_manage_function_configure': 'app\\static\\upload\\upload_conf_app',
                       'app_manage_function_configure_html': '..\\static\\upload\\upload_conf_app',
+                      'app_manage_code_configure': 'app\\static\\upload\\upload_code_expand',
+                      'app_manage_code_configure_html': '..\\static\\upload\\upload_code_expand',
                       'tenant_service_customize_function': 'app\\static\\upload\\upload_conf_tenant',
                       'tenant_service_customize_function_html': '..\\static\\upload\\upload_conf_tenant',
                       'tenant_service_role_setting': 'app\\static\\upload\\upload_conf_role',

@@ -1,5 +1,5 @@
 {% extends "app_manage_base.html" %}
-{% import "_wtf.html" as _wtf%}
+{% import "_wtf.html" as _wtf %}
 
 {% block subtitle2 %}
     <a href={{ url_for('main.index_app') }}>
@@ -7,27 +7,27 @@
     </a>
     /
     {% if not addTitle and  not editTitle %}
-    <a style="color: dodgerblue;" href={{ url_for('main.app_manage_service_deploy') }}>
-        {{  title }}
-    </a>
+        <a style="color: dodgerblue;" href={{ url_for('main.app_manage_service_deploy') }}>
+            {{ title }}
+        </a>
     {% endif %}
     {% if addTitle %}
         <a href={{ url_for('main.app_manage_service_deploy') }}>
-        {{  title }}
+            {{ title }}
         </a>
         /
         <a style="color: dodgerblue;" href={{ url_for('main.app_manage_service_deploy_add') }}>
-        {{  addTitle }}
-    </a>
+            {{ addTitle }}
+        </a>
     {% endif %}
     {% if editTitle %}
         <a href={{ url_for('main.app_manage_service_deploy') }}>
-        {{  title }}
+            {{ title }}
         </a>
         /
         <a style="color: dodgerblue;" href={{ url_for('main.app_manage_service_deploy_edit', id=0) }}>
-        {{  editTitle }}
-    </a>
+            {{ editTitle }}
+        </a>
     {% endif %}
 {% endblock %}
 
@@ -35,145 +35,361 @@
     {% if form %}
         <table class="table table-striped table-bordered">
             <thead>
-                <tr>
-                    <th>
-                        <span class="icon fa fa-pencil" style="padding: 10px"></span>
-                        <span class="title h3">{{ tableName }}</span>
-                        <a href={{ url_for('main.app_manage_service_deploy') }}>
-                            <span style="float: right; padding: 10px; padding-right: 27px" class="icon fa fa-reply fa-fw"></span>
-                        </a>
-                        <button style="float: right;" class="btn btn-info btn-xs" onclick="submitForm()">
-                            <span class="icon fa fa-save fa-fw"></span>
-                        </button>
-                    </th>
-                </tr>
+            <tr>
+                <th>
+                    <span class="icon fa fa-pencil" style="padding: 10px"></span>
+                    <span class="title h3">{{ tableName }}</span>
+                    <a href={{ url_for('main.app_manage_service_deploy') }}>
+                        <span style="float: right; padding: 10px; padding-right: 27px"
+                              class="icon fa fa-reply fa-fw"></span>
+                    </a>
+                    <button style="float: right;" class="btn btn-info btn-xs" onclick="submitForm()">
+                        <span class="icon fa fa-save fa-fw"></span>
+                    </button>
+                </th>
+            </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th>
-                        {{ _wtf.quick_form(form, form_type='horizontal') }}
-                    </th>
-                </tr>
+            <tr>
+                <th>
+                    <div class="container-fluid">
+
+                        <div class="panel-body">
+                            <form action="{{ ' ' }}" method="post" enctype="multipart/form-data" id="form-1"
+                                  class="form-horizontal">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#tab-general" data-toggle="tab">基本</a></li>
+                                    <li><a href="#tab-container" data-toggle="tab">Docker容器</a></li>
+                                    <li><a href="#tab-ports" data-toggle="tab">端口</a></li>
+                                    <li><a href="#tab-env" data-toggle="tab">环境变量</a></li>
+                                    <li><a href="#tab-label" data-toggle="tab">标签</a></li>
+                                    <li><a href="#tab-volume" data-toggle="tab">卷映射</a></li>
+                                    <li><a href="#tab-optional" data-toggle="tab">可选</a></li>
+                                    <li><a href="#tab-json" data-toggle="tab">Json Mode</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="tab-general">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">ID：</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" v-model="id" readonly="readonly">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">CPUs:</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" v-model="cpus">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Memory(MiB):</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" v-model="memory">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Disk Space(MiB):</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" v-model="disk">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Instances:</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" v-model="instance">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Command:</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" v-model="cmd">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Args:</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" v-model="args">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tab-container">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">请选择项目：</label>
+                                            <div class="col-sm-10">
+                                                <select id="project_id" class="form-control" onchange="getImages()">
+                                                    {#                                                        {{ range $index,$a := .projects}}#}
+                                                    {#                                                        <option value="{{$a.project_id}}">#}
+                                                    {#                                                            {{$a.name}}#}
+                                                    {#                                                        </option>#}
+                                                    {#                                                        {{ end }}#}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">请选择镜像：</label>
+                                            <div class="col-sm-10">
+                                                <select id="image_list" class="form-control" v-model="image">
+                                                    <option value="0">选择镜像</option>
+                                                    {#                                                        {{ range $index,$a := .images}}#}
+                                                    {#                                                        {{ range $index1,$t := $a.tags}}#}
+                                                    {#                                                        <option value="{{$a.name}}:{{$t.name}}">#}
+                                                    {#                                                            {{$a.name}}:{{$t.name}}#}
+                                                    {#                                                        </option>#}
+                                                    {#                                                        {{ end }}#}
+                                                    {#                                                        {{ end }}#}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tab-ports">
+                                        <div class="form-group" id="network-div">
+                                            <label class="col-sm-2 control-label">Network:</label>
+                                            <div class="col-sm-10">
+                                                <select id="network_list" class="form-control" v-model='network'>
+                                                    <option value="0">选择网络</option>
+                                                    <option value="BRIDGE">
+                                                        Bridged
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="port-div">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">Add a new port:</label>
+                                                <div class="col-sm-10">
+                                                    <a class="btn btn-primary" v-on:click="addNewPort"><i
+                                                            class="fa fa-plus"></i></a>
+                                                </div>
+                                            </div>
+                                            <div is="port-item"
+                                                 v-for="(p, index) in ports"
+                                                 v-bind:id="p.id"
+                                                 v-bind:port="p.port"
+                                                 v-bind:protocol="p.protocol"
+                                                 v-bind:name="p.name"
+                                                 @remove="removePorts(index)"
+                                                 @update="updatePorts">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tab-env">
+                                        <div id="env-div">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">Add a new env:</label>
+                                                <div class="col-sm-10">
+                                                    <a class="btn btn-primary" v-on:click="addNewEnv"><i
+                                                            class="fa fa-plus"></i></a>
+                                                </div>
+                                            </div>
+                                            <div is="env-item"
+                                                 v-for="(p, index) in envs"
+                                                 v-bind:id="p.id"
+                                                 v-bind:k="p.k"
+                                                 v-bind:v="p.v"
+                                                 @remove="removeEnvs(index)"
+                                                 @update="updateEnvs">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tab-label">
+                                        <div id="label-div">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">Add a new label:</label>
+                                                <div class="col-sm-10">
+                                                    <a class="btn btn-primary" v-on:click="addNewLabel"><i
+                                                            class="fa fa-plus"></i></a>
+                                                </div>
+                                            </div>
+                                            <div is="label-item"
+                                                 v-for="(p, index) in labels"
+                                                 v-bind:id="p.id"
+                                                 v-bind:k="p.k"
+                                                 v-bind:v="p.v"
+                                                 @remove="removeLabels(index)"
+                                                 @update="updateLabels">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tab-volume">
+                                        <div id="volume-div">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">Add a new volume:</label>
+                                                <div class="col-sm-10">
+                                                    <a class="btn btn-primary" v-on:click="addNewvolume"><i
+                                                            class="fa fa-plus"></i></a>
+                                                </div>
+                                            </div>
+                                            <div is="volume-item"
+                                                 v-for="(p, index) in volumes"
+                                                 v-bind:id="p.id"
+                                                 v-bind:host="p.host"
+                                                 v-bind:container="p.container"
+                                                 v-bind:mode="p.mode"
+                                                 @remove="removevolumes(index)"
+                                                 @update="updatevolumes">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tab-json">
+                                        <div class="form-group">
+                                            <label class="col-sm-1 control-label">Json</label>
+                                            <div class="col-sm-11">
+                                                    <textarea rows="25" readonly="readonly" class="form-control"
+                                                              v-model="json"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tab-optional">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">重启策略:</label>
+                                            <label class="col-sm-2 control-label" data-toggle="tooltip"
+                                                   data-placement="top" title="maximumOverCapacity required, ≤ 1 number</br>
+                      A number between 0 and 1 which is multiplied with the instance count.
+                      This is the maximum number of additional instances launched at any
+                      point of time during the upgrade process.">maximumOverCapacity:</label>
+                                            <div class="col-sm-2">
+                                                <input class="form-control" v-model="maximumOverCapacity">
+                                            </div>
+                                            <label class="col-sm-2 control-label" data-toggle="tooltip"
+                                                   data-placement="top" title="minimumHealthCapacity required, ≤ 1 number</br>
+                      A number between 0 and 1 that is multiplied with the instance count.
+                      This is the minimum number of healthy nodes that do not sacrifice
+                      overall application purpose. Marathon will make sure, during the
+                      upgrade process, that at any point of time this number of healthy
+                      instances are up.">minimumHealthCapacity:</label>
+                                            <div class="col-sm-2">
+                                                <input class="form-control" v-model="minimumHealthCapacity">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </th>
+            </tr>
             </tbody>
         </table>
-    <br>
+        <br>
     {% endif %}
     {% if not form %}
-    <table class="table table-striped table-bordered">
-        <thead>
+        <table class="table table-striped table-bordered">
+            <thead>
             <tr>
                 <th>
                     <span class="icon fa fa-bars" style="padding: 10px"></span>
-                    <span class="title h3">{{  tableName }}</span>
+                    <span class="title h3">{{ tableName }}</span>
                     <a href={{ url_for('main.app_manage_service_deploy') }}>
-                        <span style="float: right; padding: 10px; padding-right: 27px;" class="icon fa fa-refresh fa-fw"></span>
+                        <span style="float: right; padding: 10px; padding-right: 27px;"
+                              class="icon fa fa-refresh fa-fw"></span>
                     </a>
-{#                    <a href={{ url_for('main.app_manage_service_deploy_delete_select') }}>#}
-{#                        <span style="float: right; padding: 10px;" class="icon fa fa-trash-o fa-fw"></span>#}
-{#                    </a>#}
+                    {#                    <a href={{ url_for('main.app_manage_service_deploy_delete_select') }}>#}
+                    {#                        <span style="float: right; padding: 10px;" class="icon fa fa-trash-o fa-fw"></span>#}
+                    {#                    </a>#}
                     <a href={{ url_for('main.app_manage_service_deploy_add') }}>
                         <span style="float: right; padding: 10px;" class="icon fa fa-plus fa-fw"></span>
                     </a>
                 </th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr>
                 <th>
                     <table class="table table-striped table-bordered table-hover">
                         <thead>
-                            <tr>
-                                {% if isCheck %}
+                        <tr>
+                            {% if isCheck %}
                                 <th width="10px">
                                     <input type="checkbox" name="selectCheckbox" title=""
                                            onchange="selectStateChange('checkbox')">
                                 </th>
-                                {% endif %}
-                                {% for t in tHead %}
+                            {% endif %}
+                            {% for t in tHead %}
                                 <th>{{ t }}</th>
-                                {% endfor %}
-                                <th width="30px">Operation</th>
-                            </tr>
+                            {% endfor %}
+                            <th width="30px">Operation</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {% for d in data %}
-                                <tr>
-                                    {% if isCheck %}
+                        {% for d in data %}
+                            <tr>
+                                {% if isCheck %}
                                     <th><input type="checkbox" name="checkbox" title="" value="d.id"></th>
-                                    {% endif %}
-                                    <th>{{ d.id }}</th>
-                                    <th>{{ _('/landun-server-1519456210010866296') }}</th>
-                                    <th>{{ _('reg.oa.com/landun/landun:1.0.0') }}</th>
-                                    <th>{{ _('Running') }}</th>
-                                    <th>
-                                        <select style="width: 200px;" title="">
-                                            {% for a in action_list %}
-                                                <option width="200px" value={{ a }}>{{ a }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </th>
-                                    <th>
-                                        {% if isEdit %}
+                                {% endif %}
+                                <th>{{ d.id }}</th>
+                                <th>{{ _('/landun-server-1519456210010866296') }}</th>
+                                <th>{{ _('reg.oa.com/landun/landun:1.0.0') }}</th>
+                                <th>{{ _('Running') }}</th>
+                                <th>
+                                    <select style="width: 200px;" title="">
+                                        {% for a in action_list %}
+                                            <option width="200px" value={{ a }}>{{ a }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </th>
+                                <th>
+                                    {% if isEdit %}
                                         <a href={{ url_for('main.app_manage_service_deploy_edit', id=d.id) }}>
                                             <span class="icon fa fa-pencil fa-fw"></span>
                                         </a>
-                                        {% endif %}
-                                        {% if isDelete %}
+                                    {% endif %}
+                                    {% if isDelete %}
                                         <a href={{ url_for('main.app_manage_service_deploy_delete', id=d.id) }}>
                                             <span class="icon fa fa-trash-o fa-fw"></span>
                                         </a>
-                                        {% endif %}
-                                    </th>
-                                </tr>
-                            {% endfor %}
+                                    {% endif %}
+                                </th>
+                            </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </th>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
     {% endif %}
 {% endblock %}
 
 {% block scripts %}
     {{ super() }}
     <script type="text/javascript">
-        function submitForm(){
+        function submitForm() {
             $('#submitButton').click()
         }
 
-{#        function confirm() {#}
-{#            var data={#}
-{#                'name':'execute'#}
-{#            };#}
-{#            $.ajax({#}
-{#                type:'POST',#}
-{#                url:'{{url_for("main.app_manage_service_deploy_delete", id=0)}}',#}
-{#                data:JSON.stringify(data),  //转变传递的参数为字符串格式#}
-{#                contentType:'application/json; charset=UTF-8', //指定传递给服务器的是Json格式数据#}
-{#                dataType:'json',//希望服务器返回json格式的数据#}
-{#                success:function(data){#}
-{#                    $('#closeConfirmMessage').click();#}
-{#                    window.location.reload()#}
-{#                    window.location.href = '/app_manage_database_configure'#}
-{#                }#}
-{#            });#}
-{#        }#}
+        {#        function confirm() {#}
+        {#            var data={#}
+        {#                'name':'execute'#}
+        {#            };#}
+        {#            $.ajax({#}
+        {#                type:'POST',#}
+        {#                url:'{{url_for("main.app_manage_service_deploy_delete", id=0)}}',#}
+        {#                data:JSON.stringify(data),  //转变传递的参数为字符串格式#}
+        {#                contentType:'application/json; charset=UTF-8', //指定传递给服务器的是Json格式数据#}
+        {#                dataType:'json',//希望服务器返回json格式的数据#}
+        {#                success:function(data){#}
+        {#                    $('#closeConfirmMessage').click();#}
+        {#                    window.location.reload()#}
+        {#                    window.location.href = '/app_manage_database_configure'#}
+        {#                }#}
+        {#            });#}
+        {#        }#}
 
-        function selectStateChange(objName){
+        function selectStateChange(objName) {
             index = {"selectCheckbox": 0};
             var me = document.getElementsByName("selectCheckbox")[index["selectCheckbox"]].checked;
-            var objNameList=document.getElementsByName(objName);
+            var objNameList = document.getElementsByName(objName);
             var i = 0;
-            if(null!=objNameList){
-{#                alert("全选操作");#}
+            if (null != objNameList) {
+                {#                alert("全选操作");#}
                 if (me == true)
-                    for(i=0;i<objNameList.length;i++){
-                        objNameList[i].checked=true;
+                    for (i = 0; i < objNameList.length; i++) {
+                        objNameList[i].checked = true;
                     }
                 else {
-                    for(i=0;i<objNameList.length;i++){
-                        objNameList[i].checked=false;
+                    for (i = 0; i < objNameList.length; i++) {
+                        objNameList[i].checked = false;
                     }
                 }
             }
@@ -182,7 +398,7 @@
         function changeAppListMenu() {
             var app_list_menu = $("#app_list_menu");
             var value = app_list_menu.attr("class");
-            if(value.indexOf("open") >= 0) {
+            if (value.indexOf("open") >= 0) {
                 app_list_menu.removeClass("open")
             }
             else {

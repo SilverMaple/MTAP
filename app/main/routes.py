@@ -6,9 +6,14 @@
 
 import hashlib
 import os
+import logging
+import sys
 import shutil
 import json
+import subprocess
 from datetime import datetime
+
+from app.decorators import async
 from flask import render_template, flash, redirect, url_for, request, g, \
     jsonify, current_app, session
 from flask_login import current_user, login_required
@@ -25,8 +30,20 @@ from app.email import follower_notification
 from app.auth import LoginType, current_login_type
 from app import auth
 from werkzeug.datastructures import FileStorage
+from werkzeug.test import EnvironBuilder
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash
+
+logger = logging.getLogger("MirrorConstruct")
+# logger = logging.getLogger("MirrorConstruct")
+formatter = logging.Formatter('[%(asctime)s]  %(message)s')
+# formatter = logging.Formatter('[%(asctime)s][%(levelname)s] ## %(message)s')
+file_handler = logging.FileHandler("logs/mirror_construct.log")
+file_handler.setFormatter(formatter)  # 可以通过setFormatter指定输出格式
+
+# 为logger添加的日志处理器
+logger.addHandler(file_handler)
+logger.setLevel(logging.DEBUG)
 
 
 @bp.before_app_request
@@ -405,12 +422,25 @@ def registe_manage_app_extension_edit(id):
         current_data.pattern_end = form.tag_end.data
         current_data.library_desc = form.library_file_description.data
         current_data.db_init_path = form.db_info_file_path.data
-        print(form.library_file.data == None)
-        print(form.library_file.data)
+        # print(form.library_file.data == '')
+        # print(form.library_file.data)
         form.library_file.description = _('Selected File: ') + os.path.basename(current_data.library_path)
         form.library_file_depend.description = _('Selected File: ') + os.path.basename(current_data.library_depend_path)
 
-        # db.session.commit()
+        if hasattr(form.library_file.data, 'filename'):
+            filename1 = secure_filename(form.library_file.data.filename)
+            filePath1 = os.path.join(os.path.join(current_app.config['UPLOAD_FOLDERS']['registe_manage_app_extension'],
+                                                  'library'), filename1).replace('\\', '/')
+            form.library_file.data.save(filePath1)
+            current_data.library_path = filePath1
+        if hasattr(form.library_file_depend.data, 'filename'):
+            filename2 = secure_filename(form.library_file_depend.data.filename)
+            filePath2 = os.path.join(os.path.join(current_app.config['UPLOAD_FOLDERS']['registe_manage_app_extension'],
+                                                  'library_depend'), filename2).replace('\\', '/')
+            form.library_file_depend.data.save(filePath2)
+            current_data.library_depend_path = filePath2
+
+        db.session.commit()
         flash(_('App have been edited.'))
         return redirect(url_for('main.registe_manage_app_extension'))
     elif request.method == 'GET':
@@ -714,6 +744,7 @@ def get_app_name_list():
     app_name_list = [a.name for a in data]
     return app_name_list
 
+
 def get_current_selected_app_name():
     current_selected_app_name = None
     if session.get('current_selected_app_name'):
@@ -756,6 +787,40 @@ def app_manage_function_configure():
                            current_selected_app_name=get_current_selected_app_name(),
                            isCheck=isCheck, isEdit=isEdit,
                            isDelete=isDelete, tHead=tHead, data=data)
+
+
+@bp.route('/app_manage_function_configure_test')
+@login_required
+def app_manage_function_configure_test():
+    testFunc()
+    isCheck = True
+    isEdit = True
+    isDelete = True
+    session['is_delete'] = 'false'
+    tHead = [_('App Name'), _('App ID'), _('Creator')]
+    data = App.query.order_by(db.asc(App.name)).all()
+    return render_template('app_manage_function_configure.html', title=_('Online Function'),
+                           tableName=_('Function Configure'), app_name_list=get_app_name_list(),
+                           current_selected_app_name=get_current_selected_app_name(),
+                           isCheck=isCheck, isEdit=isEdit,
+                           isDelete=isDelete, tHead=tHead, data=data)
+
+
+def testFunc():
+    filePath = 'F:/test/main.html'
+    pattern = 'x;/<dd>.*API监控.*<\/dd>/{p;q};/<dd>.*<\/dd>/{x;h;d;ta};/<dd>.*/{x;H;ta};{x;h;d};:a'
+    tag_begin = '{if .role_APIguanli}'
+    tag_end = '{end}'
+    args = 'cat -n %s | sed -n "%s" | { eval $(awk \'NR==1{print "a="$1} END {print "b="$1}\'); ' \
+           'sed -e "$a i %s" -e "$b a %s" %s;} > F:/test/test.txt' % (filePath, pattern, tag_begin, tag_end, filePath)
+    shell_file = open('F:/test/temp.sh', 'w', encoding='utf-8')
+    shell_file.write(args)
+    shell_file.flush()
+    shell_file.close()
+    exec_path = "D:\Program Files\Git\git-bash.exe"
+    print(args)
+    (status, output) = subprocess.getstatusoutput([exec_path, 'F:/test/temp.sh'])
+    print(status, output)
 
 
 @bp.route('/get_file_path/<tag>', methods=['GET', 'POST'])
@@ -987,44 +1052,101 @@ def app_manage_code_configure():
     else:
         form = AddAppCodeForm(None)
     if form.validate_on_submit():
-        current_data = TenantDb.query.filter(TenantDb.id == id).first()
-        current_data.hostname = form.host_name.data
-        current_data.driver = form.database_driver.data
-        current_data.username = form.user_name.data
-        current_data.database = form.database_name.data
-        current_data.port = form.database_port.data
-        current_data.aliasname = '_'.join([form.database_driver.data, form.database_name.data])
-        current_data.type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
-        current_data.tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
-        current_data.app_id = session['current_selected_app_id']
-        if not form.user_password.data.strip() == '':
-            current_data.password = generate_password_hash(form.user_password.data)
+        current_data = AppCode.query.filter(AppCode.app_id == session['current_selected_app_id']).first()
+        current_data.repo = form.code_repo.data
+        current_data.app_expand_id = AppExpand.query.filter(AppExpand.type == form.app_type.data).first().id
+        current_data.db_config_path = form.db_config_path.data
+        app_id = App.query.filter(App.id == session['current_selected_app_id']).first().appid
+        print(app_id)
+        # app_id = 'fe01ce2a7fbac8fafaed7c982a04e229'
+
+        current_data.remote_login_configure_path = form.remote_login_config_path.data
+        current_data.remote_login_using_flag = form.remote_login_using_flag.data
+        # current_data.remote_login_using_content = form.remote_login_using_content.data
+        if hasattr(form.remote_login_using_content.data, 'filename'):
+            filename1 = secure_filename(form.remote_login_using_content.data.filename)
+            filePath1 = os.path.join(os.path.join(current_app.config['UPLOAD_FOLDERS']['app_manage_code_configure'],
+                                                  app_id), filename1).replace('\\', '/')
+            form.remote_login_using_content.data.save(filePath1)
+            current_data.remote_login_using_content = filePath1
+
+        form.library_path.data = current_data.library_path
+        form.filter_package_path.data = current_data.filter_package_path
+        # form.filter_content.data = current_data.filter_content
+        form.filter_config_path.data = current_data.filter_configure_path
+        if hasattr(form.filter_content.data, 'filename'):
+            filename1 = secure_filename(form.filter_content.data.filename)
+            filePath1 = os.path.join(os.path.join(current_app.config['UPLOAD_FOLDERS']['app_manage_code_configure'],
+                                                  app_id), filename1).replace('\\', '/')
+            form.filter_content.data.save(filePath1)
+            current_data.filter_content = filePath1
+
+        form.filter_import_flag.data = current_data.filter_import_flag
+        # form.filter_import_content.data = current_data.filter_import_content
+        form.filter_using_flag.data = current_data.filter_using_flag
+        # form.filter_using_content.data = current_data.filter_using_content
+        if hasattr(form.filter_import_content.data, 'filename'):
+            filename1 = secure_filename(form.filter_import_content.data.filename)
+            filePath1 = os.path.join(os.path.join(current_app.config['UPLOAD_FOLDERS']['app_manage_code_configure'],
+                                                  app_id), filename1).replace('\\', '/')
+            form.filter_import_content.data.save(filePath1)
+            current_data.filter_import_content = filePath1
+        if hasattr(form.filter_using_content.data, 'filename'):
+            filename1 = secure_filename(form.filter_using_content.data.filename)
+            filePath1 = os.path.join(os.path.join(current_app.config['UPLOAD_FOLDERS']['app_manage_code_configure'],
+                                                  app_id), filename1).replace('\\', '/')
+            form.filter_using_content.data.save(filePath1)
+            current_data.filter_using_content = filePath1
+
+        # form.call_starting_point.data = current_data.call_starting_point
+        # form.third_party_packages.data = current_data.third_party_packages
+        if hasattr(form.call_starting_point.data, 'filename'):
+            filename1 = secure_filename(form.call_starting_point.data.filename)
+            filePath1 = os.path.join(os.path.join(current_app.config['UPLOAD_FOLDERS']['app_manage_code_configure'],
+                                                  app_id), filename1).replace('\\', '/')
+            form.call_starting_point.data.save(filePath1)
+            current_data.call_starting_point = filePath1
+        if hasattr(form.third_party_packages.data, 'filename'):
+            filename1 = secure_filename(form.third_party_packages.data.filename)
+            filePath1 = os.path.join(os.path.join(current_app.config['UPLOAD_FOLDERS']['app_manage_code_configure'],
+                                                  app_id), filename1).replace('\\', '/')
+            form.third_party_packages.data.save(filePath1)
+            current_data.third_party_packages = filePath1
+
         db.session.commit()
-        flash(_('Tenant Database have been edited.'))
-        return redirect(url_for('main.app_manage_database_configure'))
+        flash(_('Code configuration have been edited.'))
+        return redirect(url_for('main.app_manage_code_configure'))
     elif request.method == 'GET':
         current_data = AppCode.query.filter(AppCode.app_id == session['current_selected_app_id']).first()
-        current_extension_data = AppExpand.query.filter(AppExpand.type == 'jsp servlet').first()
+        current_extension_data = AppExpand.query.filter(AppExpand.id == current_data.app_expand_id).first()
+
+        form.app_type.data = current_extension_data.type
         form.code_repo.data = current_data.repo
         form.tag_begin.data = current_extension_data.pattern_begin
         form.tag_end.data = current_extension_data.pattern_end
         form.db_config_path.data = current_data.db_config_path
         form.remote_login_config_path.data = current_data.remote_login_configure_path
         form.remote_login_using_flag.data = current_data.remote_login_using_flag
-        form.remote_login_using_content.data = current_data.remote_login_using_content
+        # form.remote_login_using_content.data = current_data.remote_login_using_content
+        form.remote_login_using_content.description = _('Selected File: ') + current_data.remote_login_using_content
 
         form.library_path.data = current_data.library_path
         form.filter_package_path.data = current_data.filter_package_path
-        form.filter_content.data = current_data.filter_content
+        # form.filter_content.data = current_data.filter_content
+        form.filter_content.description = _('Selected File: ') + current_data.filter_content
         form.filter_config_path.data = current_data.filter_configure_path
 
         form.filter_import_flag.data = current_data.filter_import_flag
-        form.filter_import_content.data = current_data.filter_import_content
+        # form.filter_import_content.data = current_data.filter_import_content
+        form.filter_import_content.description = _('Selected File: ') + current_data.filter_import_content
         form.filter_using_flag.data = current_data.filter_using_flag
-        form.filter_using_content.data = current_data.filter_using_content
+        # form.filter_using_content.data = current_data.filter_using_content
+        form.filter_using_content.description = _('Selected File: ') + current_data.filter_using_content
 
-        form.call_starting_point.data = current_data.call_starting_point
-        form.third_party_packages.data = current_data.third_party_packages
+        # form.call_starting_point.data = current_data.call_starting_point
+        # form.third_party_packages.data = current_data.third_party_packages
+        form.call_starting_point.description = _('Selected File: ') + current_data.call_starting_point
+        form.third_party_packages.description = _('Selected File: ') + current_data.third_party_packages
 
         session['validate_repo'] = form.code_repo.data
     return render_template('app_manage_code_configure.html', title=_('Edit Code Information'),
@@ -1054,30 +1176,19 @@ def app_manage_mirror_list():
 @bp.route('/app_manage_mirror_list_add', methods=['GET', 'POST'])
 @login_required
 def app_manage_mirror_list_add():
-    form = AddTenantDatabaseForm(None)
-    if form.validate_on_submit():
-        current_tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
-        current_type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
-        db.session.add(TenantDb(id=None, hostname=form.host_name.data, driver=form.database_driver.data,
-                                username=form.user_name.data,
-                                password=generate_password_hash(form.user_password.data),
-                                database=form.database_name.data, port=form.database_port.data,
-                                aliasname='_'.join([form.database_driver.data, form.database_name.data]),
-                                type=current_type, tenant_id=current_tenant_id, app_id=session['current_selected_app_id']))
-        db.session.commit()
-        flash(_('New tenant database have been added.'))
-        return redirect(url_for('main.app_manage_mirror_list'))
-    elif request.method == 'GET':
-        form.app_name.data = session['current_selected_app_name']
-        form.host_name.data = 'localhost'
-        form.database_port.data = '3306'
-        form.database_driver.data = 'mysql'
-        form.user_name.data = 'root'
+    logPath = 'logs/mirror_construct.log'
+    if os.path.isfile(logPath):
+        # os.remove(logPath)
         pass
-    return render_template('app_manage_mirror_list.html', title=_('Tenant Database Configure'),
-                           tableName=_('Add New Tenant Database'), form=form, app_name_list=get_app_name_list(),
-                           current_selected_app_name=get_current_selected_app_name(),
-                           addTitle=('Add New Tenant Database'))
+    new_log_file = open(logPath, 'w', encoding='utf-8')
+    new_log_file.write('')
+    new_log_file.flush()
+    new_log_file.close()
+
+    app_id = App.query.filter(App.id == session['current_selected_app_id']).first().appid
+    current_code = AppCode.query.filter(AppCode.app_id == session['current_selected_app_id']).first()
+    mirror_construction(current_app._get_current_object(), app_id, current_code)
+    return jsonify({'code': '0', 'logPath': logPath, 'message': 'Operation done.'})
 
 
 @bp.route('/app_manage_mirror_list_delete/<id>', methods=['GET', 'POST'])
@@ -1159,6 +1270,172 @@ def app_manage_mirror_list_edit(id):
                            editTitle=('Edit Tenant Database'))
 
 
+@bp.route('/get_log', methods=['GET', 'POST'])
+@login_required
+def get_log():
+    logStr = ''
+    data = request.get_json()
+    if os.path.isfile(data['file']):
+        logStr = open(data['file']).read()[data['start']:]
+        pos = data['start'] + len(logStr)
+        hasMore = True
+        if 'Operation done.' in logStr:
+            hasMore = False
+        return jsonify({'code': '0', 'log': logStr.replace('\n', '<br/>'), 'pos': pos, 'hasMore': hasMore})
+    else:
+        print('debug1', data['file'])
+        print('debug1', os.path.isfile(data['file']))
+        print('debug1', os.path.exists(data['file']))
+        return jsonify({'code': '-1', 'message': 'Log file not exist.%s'%(data['file'])})
+
+
+@bp.route('/remove_log', methods=['GET', 'POST'])
+@login_required
+def remove_log():
+    data = request.get_json()
+    if os.path.isfile(data['file']):
+        # os.remove(data['file'])
+        clear_file = open(data['file'], 'w')
+        clear_file.write('')
+        clear_file.flush()
+        clear_file.close()
+    return jsonify({'code': '0', 'message': 'remove log at %s' % (datetime.utcnow())})
+
+
+# mirror construction
+@async
+def mirror_construction(app, app_id, current_code):
+    with app.app_context() and app.request_context(EnvironBuilder('/','http://localhost/').get_environ()):
+    # with app.app_context():
+        remove_log()
+
+        logger.info('Operation begin:\n')
+        logger.info('1.------Reading function package, atomic function data of app------')
+
+        #read app function json
+        tag = 'package2function.json'
+        filePath = os.path.join(os.path.join(
+            current_app.config['UPLOAD_FOLDERS']['app_manage_function_configure'], app_id), tag)
+        if os.path.isfile(filePath):
+            json_dict = json.load(open(filePath, encoding='utf-8'))
+            for a in json_dict:
+                id = a['id']
+                if 'file_path' in a['data'] and 'item_pattern' in a['data']:
+                    file_path = a['data']['file_path']
+                    item_pattern = a['data']['item_pattern']
+                    # logger.info('id: %s\nfile_path: %s\nitem_pattern: %s', id, file_path, item_pattern)
+
+            logger.info('2.------Pulling code from registry------')
+            sourceSrcDir = 'F:/code/PPGo_ApiAdmin'
+            dstSrcDir = 'F:/code/Tenant_PPGo_ApiAdmin'
+
+            if os.path.exists(dstSrcDir):
+                # print('rmtree')
+                shutil.rmtree(dstSrcDir)
+            # print('copytree')
+            shutil.copytree(sourceSrcDir, dstSrcDir)
+
+            logger.info('3.------insert tag template in code------')
+            # 切换工作目录易引起线程安全问题
+            # old_cwd = os.getcwd()
+            # os.chdir(dstSrcDir)
+            args = ''
+            for a in json_dict:
+                if 'file_path' in a['data'] and 'item_pattern' in a['data'] and\
+                                a['data']['file_path'] is not '' and a['data']['item_pattern'] is not '':
+                    # filePath = 'F:/test/main.html'
+                    filePath = os.path.join(dstSrcDir, a['data']['file_path']).replace('\\', '/')
+                    # pattern = 'x;/<dd>.*API监控.*<\/dd>/{p;q};/<dd>.*<\/dd>/{x;h;d;ta};/<dd>.*/{x;H;ta};{x;h;d};:a'
+                    pattern = a['data']['item_pattern']
+                    # tag_begin = '{if .role_APIguanli}'
+                    tag_begin = '{if .role_%s}' % (a['id'])
+                    tag_end = '{end}'
+                    args += 'cat -n %s | sed -n "%s" | { eval $(awk \'NR==1{print "a="$1} END {print "b="$1}\'); ' \
+                            'sed -e "$a i %s" -e "$b a %s" %s;} > F:/temp.txt\n cp F:/temp.txt %s\n' % \
+                           (filePath, pattern, tag_begin, tag_end, filePath, filePath)
+
+            shell_file = open('F:/test/temp.sh', 'w', encoding='utf-8')
+            shell_file.write(args)
+            shell_file.flush()
+            shell_file.close()
+            exec_path = "D:\Program Files\Git\git-bash.exe"
+            # (status, output) = subprocess.getstatusoutput([exec_path, 'F:/test/temp.sh'])
+            CREATE_NO_WINDOW = 0x08000000
+            subprocess.call([exec_path, 'F:/test/temp.sh'], creationflags=CREATE_NO_WINDOW)
+            # os.chdir(old_cwd)
+
+            logger.info('4.------initialing tenant database connection------')
+            pass
+
+            logger.info('5.------extending filter code------')
+
+            filter_package_path = os.path.join(dstSrcDir, current_code.filter_package_path).replace('\\', '/')
+            filter_content = current_code.filter_content
+            if not os.path.isdir(filter_package_path):
+                os.makedirs(filter_package_path)
+            old_filter_file = os.path.join(filter_package_path, os.path.basename(filter_content)).replace('\\', '/')
+            if os.path.isfile(old_filter_file):
+                os.remove(old_filter_file)
+            shutil.copyfile(filter_content, os.path.join(filter_package_path, os.path.basename(filter_content).replace('\\', '/')))
+
+            filter_config_path = os.path.join(dstSrcDir, current_code.filter_configure_path).replace('\\', '/')
+            filter_import_flag = current_code.filter_import_flag
+            filter_import_content = current_code.filter_import_content
+            filter_using_flag = current_code.filter_using_flag
+            filter_using_content = current_code.filter_using_content
+
+            with open(filter_config_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+
+            with open(filter_config_path, "w", encoding="utf-8") as f_w:
+                for line in lines:
+                    if filter_import_flag in line:
+                        f_w.write(line)
+                        pre = line[:line.index(filter_import_flag)]
+                        wlines = open(filter_import_content, encoding="utf-8").readlines()
+                        for l in wlines:
+                            f_w.write(pre + l)
+                        # f_w.write(open(filter_import_content, encoding="utf-8").read())
+                    elif filter_using_flag in line:
+                        f_w.write(line)
+                        pre = line[:line.index(filter_using_flag)]
+                        wlines = open(filter_using_content, encoding="utf-8").readlines()
+                        for l in wlines:
+                            f_w.write(pre + l)
+                        # f_w.write(open(filter_using_content, encoding="utf-8").read())
+                    else:
+                        f_w.write(line)
+
+            logger.info('6.------extending remote login code------')
+            remote_login_config_path = os.path.join(dstSrcDir, current_code.remote_login_configure_path)
+            remote_login_using_flag = current_code.remote_login_using_flag
+            remote_login_using_content = current_code.remote_login_using_content
+            with open(remote_login_config_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+                # 写的方式打开文件
+            with open(remote_login_config_path, "w", encoding="utf-8") as f_w:
+                for line in lines:
+                    if remote_login_using_flag in line:
+                        pre = line[:line.index(remote_login_using_flag)]
+                        f_w.write(line)
+                        wlines = open(remote_login_using_content, encoding="utf-8").readlines()
+                        for l in wlines:
+                            f_w.write(pre + l)
+                    else:
+                        f_w.write(line)
+
+            logger.info('7.------packing mirror------')
+
+            logger.info('8.------uploading mirror------')
+
+            logger.info('Operation done.')
+        else:
+            logger.info('File package2function.json not exist.\nOperation done.')
+            return jsonify({'code': '-1', 'message': 'File package2function.json not exist.'})
+
+        return jsonify({'code': '0', 'message': 'Success'})
+
+
 # ---------------------------------------------------------------------------------------
 # app manage service deploy
 # ---------------------------------------------------------------------------------------
@@ -1173,7 +1450,7 @@ def app_manage_service_deploy():
     action_list = [_('Publish'), _('Adjust'), _('Restart'), _('Stop'), _('Destroy')]
     data = [App.query.order_by(db.asc(App.name)).first()]
     return render_template('app_manage_service_deploy.html', title=_('Service Deploy'),
-                           tableName=_('Service List'), action_list=action_list, app_name_list=get_app_name_list(),
+                           tableName=_('Service Container List'), action_list=action_list, app_name_list=get_app_name_list(),
                            current_selected_app_name=get_current_selected_app_name(),
                            isCheck=isCheck, isEdit=isEdit,
                            isDelete=isDelete, tHead=tHead, data=data)
@@ -1182,30 +1459,31 @@ def app_manage_service_deploy():
 @bp.route('/app_manage_service_deploy_add', methods=['GET', 'POST'])
 @login_required
 def app_manage_service_deploy_add():
-    form = AddTenantDatabaseForm(None)
-    if form.validate_on_submit():
-        current_tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
-        current_type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
-        db.session.add(TenantDb(id=None, hostname=form.host_name.data, driver=form.database_driver.data,
-                                username=form.user_name.data,
-                                password=generate_password_hash(form.user_password.data),
-                                database=form.database_name.data, port=form.database_port.data,
-                                aliasname='_'.join([form.database_driver.data, form.database_name.data]),
-                                type=current_type, tenant_id=current_tenant_id, app_id=session['current_selected_app_id']))
-        db.session.commit()
+    form = True
+    if request.method == 'POST':
+    # if form.validate_on_submit():
+    #     current_tenant_id = Tenant.query.filter(Tenant.name == form.tenant_name.data).first().id
+    #     current_type = 'system' if form.system_extension.data == 'System Extension' else 'origin'
+    #     db.session.add(TenantDb(id=None, hostname=form.host_name.data, driver=form.database_driver.data,
+    #                             username=form.user_name.data,
+    #                             password=generate_password_hash(form.user_password.data),
+    #                             database=form.database_name.data, port=form.database_port.data,
+    #                             aliasname='_'.join([form.database_driver.data, form.database_name.data]),
+    #                             type=current_type, tenant_id=current_tenant_id, app_id=session['current_selected_app_id']))
+    #     db.session.commit()
         flash(_('New tenant database have been added.'))
         return redirect(url_for('main.app_manage_service_deploy'))
     elif request.method == 'GET':
-        form.app_name.data = session['current_selected_app_name']
-        form.host_name.data = 'localhost'
-        form.database_port.data = '3306'
-        form.database_driver.data = 'mysql'
-        form.user_name.data = 'root'
+        # form.app_name.data = session['current_selected_app_name']
+        # form.host_name.data = 'localhost'
+        # form.database_port.data = '3306'
+        # form.database_driver.data = 'mysql'
+        # form.user_name.data = 'root'
         pass
-    return render_template('app_manage_service_deploy.html', title=_('Tenant Database Configure'),
-                           tableName=_('Add New Tenant Database'), form=form, app_name_list=get_app_name_list(),
+    return render_template('app_manage_service_deploy.html', title=_('Service Deploy'),
+                           tableName=_('Add New Container'), form=form, app_name_list=get_app_name_list(),
                            current_selected_app_name=get_current_selected_app_name(),
-                           addTitle=('Add New Tenant Database'))
+                           addTitle=('Add New Container'))
 
 
 @bp.route('/app_manage_service_deploy_delete/<id>', methods=['GET', 'POST'])
