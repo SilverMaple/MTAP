@@ -46,4 +46,5 @@ class Config(object):
                       'tenant_service_customize_function_html': '..\\static\\upload\\upload_conf_tenant',
                       'tenant_service_role_setting': 'app\\static\\upload\\upload_conf_role',
                       'tenant_service_role_setting_html': '..\\static\\upload\\upload_conf_role',
+                      'library_path': 'app\\static\\upload\\upload_app_extension\\library'
                       }

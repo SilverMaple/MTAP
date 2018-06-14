@@ -70,3 +70,11 @@ class ResetPasswordForm(FlaskForm):
 # class PostForm(FlaskForm):
 #     post = TextAreaField(_l('Say something'), validators=[DataRequired()])
 #     submit = SubmitField(_l('Submit'))
+
+
+class RemoteLoginForm(FlaskForm):
+    app_id = StringField(_l('App ID'), validators=[DataRequired()])
+    tenant_id = StringField(_l('Tenant ID'), validators=[DataRequired()])
+    username = StringField(_l('Username'), validators=[DataRequired()])
+    password = PasswordField(_l('Password'), validators=[DataRequired()])
+    submit = SubmitField(_l('Log In'))

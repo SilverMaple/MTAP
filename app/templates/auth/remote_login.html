@@ -1,0 +1,36 @@
+{% extends 'auth/base_auth.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1 style="display:inline;">{{ _('Remote Login') }}</h1>
+    <p></p>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        $(document).ready(function () {
+            if (getQueryString("appID")) {
+                $('#appID').val(getQueryString("appID"));
+            }
+            if (getQueryString("tenantID")) {
+                // $('#tenantID').val(getQueryString("tenantID"));
+            }
+        });
+
+        /*
+         获取url参数
+         */
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)return unescape(r[2]);
+            return null;
+        }
+    </script>
+{% endblock %}

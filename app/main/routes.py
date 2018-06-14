@@ -11,11 +11,12 @@ import sys
 import shutil
 import json
 import subprocess
+import time
 from datetime import datetime
 
 from app.decorators import async
 from flask import render_template, flash, redirect, url_for, request, g, \
-    jsonify, current_app, session
+    jsonify, current_app, session, make_response
 from flask_login import current_user, login_required
 from flask_babel import _, get_locale
 from flask_uploads import UploadSet
@@ -29,6 +30,8 @@ from app.main import bp
 from app.email import follower_notification
 from app.auth import LoginType, current_login_type
 from app import auth
+from pip._internal import commands
+from requests import Response
 from werkzeug.datastructures import FileStorage
 from werkzeug.test import EnvironBuilder
 from werkzeug.utils import secure_filename
@@ -37,6 +40,7 @@ from werkzeug.security import generate_password_hash
 logger = logging.getLogger("MirrorConstruct")
 # logger = logging.getLogger("MirrorConstruct")
 formatter = logging.Formatter('[%(asctime)s]  %(message)s')
+blank_formatter = logging.Formatter('')
 # formatter = logging.Formatter('[%(asctime)s][%(levelname)s] ## %(message)s')
 file_handler = logging.FileHandler("logs/mirror_construct.log")
 file_handler.setFormatter(formatter)  # 可以通过setFormatter指定输出格式
@@ -1348,8 +1352,8 @@ def mirror_construction(app, app_id, current_code):
                     # pattern = 'x;/<dd>.*API监控.*<\/dd>/{p;q};/<dd>.*<\/dd>/{x;h;d;ta};/<dd>.*/{x;H;ta};{x;h;d};:a'
                     pattern = a['data']['item_pattern']
                     # tag_begin = '{if .role_APIguanli}'
-                    tag_begin = '{if .role_%s}' % (a['id'])
-                    tag_end = '{end}'
+                    tag_begin = '{{if .role_%s}}' % (a['id'])
+                    tag_end = '{{end}}'
                     args += 'cat -n %s | sed -n "%s" | { eval $(awk \'NR==1{print "a="$1} END {print "b="$1}\'); ' \
                             'sed -e "$a i %s" -e "$b a %s" %s;} > F:/temp.txt\n cp F:/temp.txt %s\n' % \
                            (filePath, pattern, tag_begin, tag_end, filePath, filePath)
@@ -1423,11 +1427,50 @@ def mirror_construction(app, app_id, current_code):
                             f_w.write(pre + l)
                     else:
                         f_w.write(line)
+            # 补充库文件
+            library_src_path = os.path.join(current_app.config['UPLOAD_FOLDERS']['library_path'],
+                                            'go beego\\saas_support')
+            library_dst_path = os.path.join(os.path.join(dstSrcDir, current_code.library_path), 'saas_support')
+            # if os.path.exists(library_path):
+            #     # print('rmtree')
+            #     shutil.rmtree(library_path)
+            # print('copytree')
+            shutil.copytree(library_src_path, library_dst_path)
 
             logger.info('7.------packing mirror------')
+            file_handler.setFormatter(blank_formatter)  # 改变格式
+            # subprocess.call([exec_path, 'docker build -t testdocker:v1 %s'%(dstSrcDir)], creationflags=CREATE_NO_WINDOW)
+            # state, output = subprocess.getstatusoutput('docker build -t testdocker:v1 %s'%(dstSrcDir))
+            cmd = 'docker build -t reg.silvermaple.com/demo/demo:1.0.0 %s'%(dstSrcDir)
 
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            while p.poll() is None:
+                line = p.stdout.readline()
+                line = line.strip()
+                if line:
+                    logger.info(str(line, encoding = "utf-8"))
+            if p.returncode == 0:
+                logger.info('Mirror packed success.')
+            else:
+                logger.info('Mirror packed failed.')
+
+            file_handler.setFormatter(formatter)  # 指定输出格式
             logger.info('8.------uploading mirror------')
-
+            file_handler.setFormatter(blank_formatter)
+            cmd = 'docker push reg.silvermaple.com/demo/demo:1.0.0'
+            # state, output = subprocess.getstatusoutput(cmd)
+            # logger.info(output)
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            while p.poll() is None:
+                line = p.stdout.readline()
+                line = line.strip()
+                if line:
+                    logger.info(str(line, encoding = "utf-8"))
+            if p.returncode == 0:
+                logger.info('Mirror uploaded success.')
+            else:
+                logger.info('Mirror uploaded failed.')
+            file_handler.setFormatter(formatter)  # 指定输出格式
             logger.info('Operation done.')
         else:
             logger.info('File package2function.json not exist.\nOperation done.')
@@ -1989,3 +2032,91 @@ def tenant_service_user_setting_edit(id):
                            current_selected_app_name=get_current_selected_app_name(),
                            isCheck=isCheck, isEdit=isEdit, current_tenant_name=current_tenant_name,
                            isDelete=isDelete, tHead=tHead, data=data)
+
+
+# ---------------------------------------------------------------------------------------
+# remote api service
+# ---------------------------------------------------------------------------------------
+HTTPMETHOD = {
+    'GET':     "GET",
+    'POST':    "POST",
+    'PUT':     "PUT",
+    'DELETE':  "DELETE",
+    'PATCH':   "PATCH",
+    'OPTIONS': "OPTIONS",
+    'HEAD':    "HEAD",
+    'TRACE':   "TRACE",
+    'CONNECT': "CONNECT",
+}
+
+ErrMsgs = {
+    'FAILED':       "Failed;",
+    'NOTFOUND':     "Not found;",
+    'SUCCESS':      "Success;",
+    'UNEXPECTED':   "Something unexpected happened;",
+    'UNAUTHORIZED': "You are not authorized to do that;",
+}
+
+class ResponseBaseStruct():
+
+    Success = True
+    Errmsg = ErrMsgs['SUCCESS']
+
+class ResponseStruct(ResponseBaseStruct):
+    Data = {}
+    HasMore = False
+    Next = ''
+
+def obj2json(obj):
+    return {
+        "Success": obj.Success,
+        "Errmsg": obj.Errmsg,
+        "Data": obj.Data,
+        "HasMore": obj.HasMore,
+        "Next": obj.Next
+    }
+
+
+@bp.route('/funcData', methods=['GET', 'POST'])
+def getFuncData():
+    # print(appID, tenantID, userName, accessToken)
+
+    form = request.form
+    appID = form['appID']
+    tenantID = form['tenantID']
+    data_json = None
+    dataFile = os.path.join(os.path.join(os.path.join(
+        current_app.config['UPLOAD_FOLDERS']['tenant_service_customize_function'],
+        appID), tenantID), 'version2function.json')
+    if os.path.isfile(dataFile):
+        data_json = json.load(open(dataFile, 'r', encoding='utf-8'))
+    rs = ResponseStruct()
+    rs.Success = True
+    rs.Errmsg = ErrMsgs['SUCCESS']
+    rs.Data = {}
+    rs.Data['ModTime'] = str(time.time())
+    rs.Data['Info'] = []
+    for v in data_json:
+        print(v)
+        rs.Data['Info'].append({'data': {}, 'id': 'role_' + v['id']})
+    print(rs.Data)
+    response = current_app.make_response((json.dumps(rs, default=obj2json), 200))
+    # response = current_app.make_response((data_json, '200', 'application/json'))
+    return response
+
+
+@bp.route('/funcDataCheck', methods=['GET', 'POST'])
+def funcDataCheck():
+    form = request.form
+    appID = form['appID']
+    tenantID = form['tenantID']
+    data_json = None
+    dataFile = os.path.join(os.path.join(os.path.join(
+        current_app.config['UPLOAD_FOLDERS']['tenant_service_customize_function'],
+        appID), tenantID), 'version2function.json')
+
+    if os.path.isfile(dataFile):
+        data_json = json.load(open(dataFile, 'r', encoding='utf-8'))
+    print(data_json)
+    response = current_app.make_response("success", 200)
+    return response

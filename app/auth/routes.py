@@ -3,15 +3,19 @@
 # @Author  : SilverMaple
 # @Site    : https://github.com/SilverMaple
 # @File    : routes.py
+import json
+import os
+import time
 
-from flask import render_template, redirect, url_for, flash, request, session
+from flask import render_template, redirect, url_for, flash, request, session, make_response, current_app
+from requests import cookies
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_babel import _
 from app import db
 from app.auth import bp
 from app.auth.forms import LoginForm, RegistrationForm, \
-    ResetPasswordRequestForm, ResetPasswordForm
+    ResetPasswordRequestForm, ResetPasswordForm, RemoteLoginForm
 from app.models import User
 from app.auth.email import send_password_reset_email
 from app.auth import current_login_type
@@ -124,3 +128,32 @@ def reset_password(token):
         flash(_('Your password has been reset.'))
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)
+
+
+# remote login
+@bp.route('/remote_login', methods=['GET', 'POST'])
+def remote_login():
+    form = RemoteLoginForm()
+    if form.validate_on_submit():
+        # user = User.query.filter_by(username=form.username.data).first()
+        # if user is None or not user.check_password(form.password.data):
+        #     flash(_('Invalid username or password'))
+        #     return redirect(url_for('auth.login'))
+        # init_app_manager()
+        # init_tenant_service()
+        # login_user(user, remember=form.remember_me.data)
+        # next_page = request.args.get('next')
+        # if not next_page or url_parse(next_page).netloc != '':
+        #     next_page = url_for('main.index')
+        # return redirect
+        # verify code...
+
+        response = current_app.make_response(render_template('index.html'))
+        response.set_cookie("saas_appID", form.app_id.data, 86400)
+        response.set_cookie("saas_tenantID", form.tenant_id.data, 86400)
+        response.set_cookie("saas_userName", form.username.data, 86400)
+        response.set_cookie("saas_accessToken", str(time.time()), 86400)
+        response.set_cookie("saas_dataSourceFile", './static/TenantDB.json', 86400)
+        response.set_cookie("saas_apiAddr", 'http://110.64.91.68:5000', 86400)
+        return response
+    return render_template('auth/remote_login.html', title=_('Sign In'), form=form)
