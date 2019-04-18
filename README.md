@@ -1,3 +1,3 @@
 # MTAP
-
-MTAP is the shorthand for Multi-Tenant Application Platform.
+## Multi-Tenant Application Platform
+![image](https://github.com/SilverMaple/MTAP/blob/master/scene.png)
